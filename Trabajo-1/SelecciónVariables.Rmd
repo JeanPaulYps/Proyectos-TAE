@@ -1,0 +1,145 @@
+---
+title: "SelecciónVariables"
+author: "Laura Daniela Hoyos Peña"
+date: "24/4/2021"
+output:
+  html_document:
+    df_print: paged
+---
+```{r}
+library(tidyverse)
+library(caret)
+library(psych)
+```
+
+```{r,echo=FALSE}
+datos<-read.csv("VariablesEntrada.csv",header = TRUE,sep = ",")#39602 observaciones
+datos<-na.omit(datos, na.action="omit")#19323 observaciones
+```
+# MODELO CON TODAS LAS 11 VARIABLES 
+Se cuenta con un total de once (11) variables.
+cuatro (4) de ellas númericas y siete (7) de tipo categoricas. 
+```{r}
+#base de datos sin normalizar
+datos_sel <- datos %>% 
+  select(c('Nivel_educativo_jefe','Estado_civil_jefe','Grado_satisfaccion_de_vida_jefe','Hijos','Numero_personas_por_casa','Nivel_educativo_pareja','Grado_satisfaccion_de_vida_pareja','Escolaridad_padre_pareja','Escolaridad_madre_pareja','Escolaridad_padre_jefe','Escolaridad_madre_jefe')) %>%
+    mutate(Nivel_educativo_jefe = as.data.frame(dummy.code(Nivel_educativo_jefe))) %>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Estado_civil_jefe))) %>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Nivel_educativo_pareja)))%>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Escolaridad_padre_pareja)))%>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Escolaridad_madre_pareja)))%>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Escolaridad_padre_jefe)))%>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Escolaridad_madre_jefe))) %>%
+    mutate(Nivel_educativo_pareja = as.numeric(Nivel_educativo_pareja)) %>%
+    mutate(Escolaridad_padre_pareja = as.numeric(Escolaridad_padre_pareja)) %>%
+    mutate(Escolaridad_madre_pareja = as.numeric(Escolaridad_madre_pareja)) %>%
+    mutate(Escolaridad_padre_jefe = as.numeric(Escolaridad_padre_jefe)) %>%
+    mutate(Escolaridad_madre_jefe = as.numeric(Escolaridad_madre_jefe)) 
+  
+
+#se normalizan las variables cuantitativas
+datos_normalizados=datos_sel
+datos_normalizados$Grado_satisfaccion_de_vida_jefe=scale(datos_normalizados$Grado_satisfaccion_de_vida_jefe,center = TRUE, scale = TRUE)
+datos_normalizados$Numero_personas_por_casa=scale(datos_normalizados$Numero_personas_por_casa,center = TRUE, scale = TRUE)
+datos_normalizados$Grado_satisfaccion_de_vida_pareja=scale(datos_normalizados$Grado_satisfaccion_de_vida_pareja,center = TRUE, scale = TRUE)
+```
+
+
+```{r}
+#separar bases de datos
+numero<-123456789
+set.seed(numero)
+subset<-sample((1:nrow(datos_normalizados)), (nrow(datos_normalizados)/2)+1)
+Train<-datos_normalizados[subset,] #9662 datos Entrena
+Test<-datos_normalizados[-subset,] #9661 datos Validación
+Train1<-Train[,-4]
+Test1<-Test[,-4]
+y_Train<-Train$Hijos
+y_Test<-Test$Hijos
+```
+```{r}
+#modelo de knn y predicción de error
+library(caret)
+modelo_knn<-caret::knnreg(Train1,y_Train,k=18)
+y_predict<- predict(modelo_knn,newdata = Train1)
+error<-mean((y_predict-y_Train)^2)
+rmse<-sqrt(error)
+```
+
+# SELECCIÓN DE VARIABLES CON OLSRR
+
+```{r}
+datos1<-datos[,3:13]#base de datos sin las variables x y directorio
+modelo<-lm(Hijos~.,data=datos1)#modelo de regresion lineal
+```
+
+```{r}
+#Selección Paso a Paso
+library(olsrr)
+reg.seg<-ols_step_both_p(modelo)
+reg.seg
+```
+
+```{r}
+# Regresión hacia adelante
+reg.adel<-ols_step_forward_p(modelo)
+reg.adel
+```
+
+```{r}
+# Regresión hacia atrás
+reg.atr<-ols_step_backward_p(modelo)
+reg.atr
+```
+# SELECCION DE VARIABLES CON CARET
+
+```{r}
+datos1<-datos[,3:13]#base de datos sin las variables x y directorio
+```
+
+
+```{r}
+datosConFactores <- datos1 %>%
+          mutate(Nivel_educativo_jefe = as.numeric(Nivel_educativo_jefe)) %>%
+          mutate(Estado_civil_jefe = as.numeric(Estado_civil_jefe)) %>%
+          mutate(Estado_civil_jefe = as.numeric(Nivel_educativo_pareja))%>%
+          mutate(Estado_civil_jefe = as.numeric(Escolaridad_padre_pareja))%>%
+          mutate(Estado_civil_jefe = as.numeric(Escolaridad_madre_pareja))%>%
+          mutate(Estado_civil_jefe = as.numeric(Escolaridad_padre_jefe))%>%
+          mutate(Estado_civil_jefe = as.numeric(Escolaridad_madre_jefe)) %>%
+          mutate(Nivel_educativo_pareja = as.numeric(Nivel_educativo_pareja)) %>%
+          mutate(Escolaridad_padre_pareja = as.numeric(Escolaridad_padre_pareja)) %>%
+          mutate(Escolaridad_madre_pareja = as.numeric(Escolaridad_madre_pareja)) %>%
+          mutate(Escolaridad_padre_jefe = as.numeric(Escolaridad_padre_jefe)) %>%
+          mutate(Escolaridad_madre_jefe = as.numeric(Escolaridad_madre_jefe)) 
+```
+
+```{r}
+library('fastDummies')
+datoConDummies <- datos1 %>%
+    dummy_cols(select_columns = c('Nivel_educativo_jefe', 'Estado_civil_jefe', 'Nivel_educativo_pareja',
+                                  'Escolaridad_padre_pareja', 'Escolaridad_madre_pareja', 
+                                  'Escolaridad_padre_jefe', 'Escolaridad_madre_jefe')) %>%
+    mutate(Nivel_educativo_jefe = as.numeric(Nivel_educativo_jefe)) %>%
+    mutate(Estado_civil_jefe = as.numeric(Estado_civil_jefe)) %>%
+    mutate(Nivel_educativo_pareja = as.numeric(Nivel_educativo_pareja)) %>%
+    mutate(Escolaridad_padre_pareja = as.numeric(Escolaridad_padre_pareja)) %>%
+    mutate(Escolaridad_madre_pareja = as.numeric(Escolaridad_madre_pareja)) %>%
+    mutate(Escolaridad_padre_jefe = as.numeric(Escolaridad_padre_jefe)) %>%
+    mutate(Escolaridad_madre_jefe = as.numeric(Escolaridad_madre_jefe)) 
+```
+
+
+```{r}
+set.seed(10)
+datos1<-datos[,3:13]#base de datos sin las variables x y directorio
+y<-datosConFactores$Hijos
+subsets <- c(1:5, 10, 15, 20, 25)
+x<-data.frame(datosConFactores[,-10])
+ctrl <- rfeControl(functions = lmFuncs, method = "CV", verbose = FALSE,returnResamp = "final")
+lmProfile <- rfe(x[,], y, sizes = subsets, rfeControl = ctrl, metric = "RMSE")
+print(lmProfile)
+```
+
+
+
