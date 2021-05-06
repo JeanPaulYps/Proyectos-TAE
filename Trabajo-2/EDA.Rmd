@@ -24,7 +24,7 @@ verTablaResumenPorCategoria <- function(df, titulo, titulosColumnas)
 
 obtenerTotalPorCategoria <- function(df)
 {
-  totalPorCategoria <- colSums(df/1000000000)
+  totalPorCategoria <- colSums(df)
   return(totalPorCategoria)
 }
 
@@ -70,8 +70,9 @@ tablaResumenTicketPromedioDeEntrada
 
 ```{r, fig.width=12}
 totalPorCategoria <- obtenerTotalPorCategoria(valorPromedioTicketEntrada)
-barplot(totalPorCategoria, ylim=c(0,12000),
-        xlab="Canal", ylab="Dinero total (en millones de pesos)") 
+totalPorCategoriaPorMilesDeMillones <- totalPorCategoria/1000000000
+barplot(totalPorCategoriaPorMilesDeMillones, ylim=c(0,12000),
+        xlab="Canal", ylab="Dinero total (en miles de millones de pesos)") 
 ```
 
 
@@ -94,15 +95,93 @@ mejoresClientes
 table(mejoresClientes$ciclo_financiero)
 ```
 
+# Analisis de transacciones promedio por canal
 
 
 ```{r}
-datos[grep("en_tx.*", names(datos))]
+transaccionesPromedioPorCanal <-  datos[grep("en_tx.*", names(datos))] %>% 
+                               setNames(c("Canal 1","Canal 2",
+                                          "Canal 3","Canal 4",
+                                          "Canal 5","Canal 6",
+                                          "Canal 7","Canal 8",
+                                          "Canal 9","Canal 10",
+                                          "Otros canales"))
+```
+
+```{r}
+tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(transaccionesPromedioPorCanal, "Transacciones promedio de entrada por canal", c("Valor total por canal"))
+tablaResumenTicketPromedioDeEntrada
+```
+
+
+
+```{r, fig.width=13}
+totalDeTransaccionesPorCanal <- obtenerTotalPorCategoria(transaccionesPromedioPorCanal)
+totalDeTransaccionesPorCanalEnMillonesDePesos <- totalDeTransaccionesPorCanal/1000000
+barplot(totalDeTransaccionesPorCanalEnMillonesDePesos, ylim=c(0,6),
+        xlab="Canal", ylab="Dinero total (en millones de pesos)") 
+```
+
+```{r}
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal), caption="Porcentaje de transacciones por canal", col.names="Porcentaje por canal")
 ```
 
 
 ```{r}
-datos[grep("sal_vm.*", names(datos))]
+clientesConTransaccionesDeEntradaMasValiosos <- datos[grep("nit|en_tx.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_tx")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100 ) %>% head(n=50) 
+sum(clientesConTransaccionesDeEntradaMasValiosos$totalPorcentaje)
+clientesConTransaccionesDeEntradaMasValiosos
 ```
+
+```{r}
+mejoresTransacciones <- inner_join(datos, clientesConTransaccionesDeEntradaMasValiosos, by=c("nit" = "nit"))
+mejoresTransacciones
+```
+
+```{r}
+table(mejoresTransacciones$ciclo_financiero)
+```
+# Transacciones de salida
+
+```{r}
+transaccionesPromedioDeSalida <-  datos[grep("sal_vm.*", names(datos))] %>% 
+                               setNames(c("Canal 5","Canal 2",
+                                          "Canal 8","Otros canales"))
+transaccionesPromedioDeSalida
+```
+
+
+```{r}
+tablaResumenTransaccionesDeSalida <- verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Valor promedio del ticket de salida por canal", c("ValorTotalPorCanales"))
+tablaResumenTransaccionesDeSalida
+```
+
+
+```{r}
+totalTransaccionesDeSalida <- obtenerTotalPorCategoria(transaccionesPromedioDeSalida)
+totalTransaccionesDeSalidaPorMilesDeMillones <- totalTransaccionesDeSalida/1000000000
+barplot(totalTransaccionesDeSalidaPorMilesDeMillones, ylim=c(0,12000),
+        xlab="Canal", ylab="Dinero total (en miles de millones de pesos)") 
+```
+
+
+
+```{r}
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
