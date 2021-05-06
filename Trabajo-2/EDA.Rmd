@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r, warning=F, echo=F}
@@ -10,7 +12,7 @@ datos = datos[!duplicated(datos$nit),]
 
 ```
 
-```{r}
+```{r, echo=F}
 verTablaResumenPorCategoria <- function(df, titulo, titulosColumnas)
 {
   tablaResumen <- df[, order(colSums(df), decreasing = T)] %>%
