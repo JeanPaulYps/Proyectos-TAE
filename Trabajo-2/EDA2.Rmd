@@ -1,0 +1,148 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r, warning=F, echo=F, include=F}
+library(tidyverse)
+datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
+datos = datos[!duplicated(datos$nit),]
+```
+
+```{r}
+calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreColumnaPorcentajes)
+{
+  dataFrameConTotalYPorcentajes <- df %>% mutate(
+                                              ColumnaTotal = rowSums(select(.,contains(regexColumnas))),
+                                              ColumnaPorcentajes= ColumnaTotal/sum(ColumnaTotal)*100
+                                          ) #%>%
+                                          # setNames(
+                                          #   c("ColumnaTotal", "ColumnaPorcentajes"),
+                                          #   c(nombreColumnaTotal, nombreColumnaPorcentajes)
+                                          # ) 
+  colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaTotal")] <- 
+    nombreColumnaTotal
+  colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaPorcentajes")] <- 
+    nombreColumnaPorcentajes
+                                          
+  return(dataFrameConTotalYPorcentajes)
+}
+```
+
+ 
+```{r}
+clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_vm")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100) %>% head(n=300) 
+sum(clientesConTicketsDeEntradaMasValiosos$totalPorcentaje)
+clientesConTicketsDeEntradaMasValiosos
+```
+
+```{r}
+mejoresClientes <- inner_join(datos, clientesConTicketsDeEntradaMasValiosos, by=c("nit" = "nit"))
+mejoresClientes
+```
+
+
+```{r}
+table(mejoresClientes$ciclo_financiero)
+```
+
+
+
+```{r}
+clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos))]  %>%  
+                                          mutate(total = rowSums(select(.,contains("en_vm")))) %>% 
+                                          arrange(desc(total)) %>% 
+                                          mutate(totalPorcentaje= total/sum(total)*100) %>%
+                                          filter(totalPorcentaje != 0) 
+clientesConTicketsDeEntradaMasValiosos
+```
+
+
+```{r}
+datosConPorcentajesYTotales <-  datos %>% 
+  calcularTotalPorFilas("en_vm", "total_tickets_de_entrada_cliente", "porcentaje_de_tickets_de_entrada_cliente") %>%
+  calcularTotalPorFilas("en_tx", "total_transacciones_de_entrada_cliente", "porcentaje_transacciones_de_entrada_cliente") %>%
+  calcularTotalPorFilas("sal_vm", "total_tickets_de_salida_cliente", "porcentaje_tickets_de_salida_cliente") %>% 
+  calcularTotalPorFilas("sal_tx", "total_transacciones_de_salida_cliente", "porcentaje_transacciones_de_salida_cliente") 
+```
+
+# Analisis de los clientes con mas tickets de entrada 
+
+```{r}
+resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
+{
+    resumenDeMayoria <- dfMayoria %>%
+      count(.dots=columna) %>%
+      mutate(n = n/sum(n) * 100)
+    
+    resumenDeMinoria <- dfMinoria %>%
+      count(.dots=columna) %>%
+      mutate(n = n/sum(n) * 100)
+    criterioJoin <- paste(columna, columna, sep=" = ")
+    resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
+    return(resumenComparativo)
+}
+```
+
+
+
+```{r}
+clientesQueGeneranLaMayoriaTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               head(n=300)
+clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               slice(301: n())
+sum(clientesQueGeneranLaMayoriaTicketsEntrada$porcentaje_de_tickets_de_entrada_cliente)
+sum(clientesQueGeneranMenorTicketsEntrada$porcentaje_de_tickets_de_entrada_cliente)
+```
+
+
+
+```{r}
+table(clientesQueGeneranLaMayoriaTicketsEntrada$impo_cv) 
+table(clientesQueGeneranMenorTicketsEntrada$impo_cv)
+```
+
+
+
+
+```{r}
+ImpoCVMayoria <- clientesQueGeneranLaMayoriaTicketsEntrada %>%
+  count(impo_cv, sort = TRUE) %>%
+  mutate(n = n/sum(n) * 100)
+
+ImpoCVMinoria <- clientesQueGeneranMenorTicketsEntrada %>%
+  count(impo_cv, sort = TRUE) %>%
+  mutate(n = n/sum(n) * 100)
+
+```
+
+
+
+
+```{r}
+ImpoCV <- ImpoCVMayoria %>% inner_join(ImpoCVMinoria, by=c("impo_cv" = "impo_cv"))
+ggplot(data=reshape2::melt(ImpoCV, id.vars = "impo_cv"), aes(x=impo_cv, y=value, fill=variable)) +
+  geom_bar(stat="identity", position=position_dodge()) + 
+  scale_fill_discrete(name = "ImpoCV", labels = c("ImpoCV mayoria", "ImpoCV minoria")) +
+  labs(title="Porcentaje de importaciones por cada subgrupo", x="ImpoCV", y="Porcentaje") 
+
+```
+
+```{r}
+columnasCategoricas = c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory",  "tiene_ventas_fisicas",
+                        "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc", 
+                        "rotacion_cxp", "ciclo_financiero", "ciclo_financiero")
+for (columna in columnasCategoricas)
+{
+  print(resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
+                                     clientesQueGeneranMenorTicketsEntrada, columna))
+}
+```
+
+

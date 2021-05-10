@@ -5,11 +5,10 @@ output:
     df_print: paged
 ---
 
-```{r, warning=F, echo=F}
+```{r, warning=F, echo=F, include=F}
 library(tidyverse)
 datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
 datos = datos[!duplicated(datos$nit),]
-
 ```
 
 ```{r, echo=F}
@@ -83,19 +82,8 @@ barplot(totalPorCategoriaPorMilesDeMillones, ylim=c(0,12000),
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
 ```
 
-```{r}
-clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_vm")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100) %>% head(n=300) 
-sum(clientesConTicketsDeEntradaMasValiosos$totalPorcentaje)
-clientesConTicketsDeEntradaMasValiosos
-```
 
-```{r}
-mejoresClientes <- inner_join(datos, clientesConTicketsDeEntradaMasValiosos, by=c("nit" = "nit"))
-mejoresClientes
-```
-```{r}
-table(mejoresClientes$ciclo_financiero)
-```
+
 
 # Analisis de transacciones promedio por canal
 
@@ -260,20 +248,14 @@ left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") %>% m
 ```
 
 
-```{r}
-ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=canal, y=value, fill=variable)) +
-  geom_bar(width = 0.7, stat="identity", position=position_dodge()) + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
-  #coord_flip()
-```
 
 
 ```{r}
 ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=canal, y=value, fill=variable)) +
   geom_bar(width = 0.7, stat="identity", position=position_dodge()) + 
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
-  labs(title="Porcentaje de dinero por cada categoria por cada canal", x="Canales", y="Porcentaje") + 
-  ggsave("plot.png")
+  labs(title="Porcentaje de dinero por cada categoria por cada canal", x="Canales", y="Porcentaje") 
+  #coord_flip()
 ```
 
 
