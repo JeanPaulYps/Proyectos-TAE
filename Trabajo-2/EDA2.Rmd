@@ -137,12 +137,78 @@ ggplot(data=reshape2::melt(ImpoCV, id.vars = "impo_cv"), aes(x=impo_cv, y=value,
 ```{r}
 columnasCategoricas = c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory",  "tiene_ventas_fisicas",
                         "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc", 
-                        "rotacion_cxp", "ciclo_financiero", "ciclo_financiero")
+                        "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
 for (columna in columnasCategoricas)
 {
   print(resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
                                      clientesQueGeneranMenorTicketsEntrada, columna))
 }
 ```
+
+
+```{r}
+
+
+graficar_datos <- function (df, columnaDf, nombreMasLegible)
+{
+  titulo <- sprintf("Porcentaje de %s para cada subgrupo", nombreMasLegible)
+  etiquetaMayoria <- sprintf("%s mayoria", nombreMasLegible)
+  etiquetaMinoria <- sprintf("%s minoria", nombreMasLegible)
+  datos <- reshape2::melt(df, id.vars=columnaDf)
+  grafico <- ggplot(data=datos, aes(x=columnaDf, y=value, fill=variable)) +
+          geom_bar(stat="identity", position=position_dodge()) + 
+          scale_fill_discrete(name = nombreMasLegible, labels = c(etiquetaMayoria, etiquetaMinoria)) +
+          labs(title=titulo, x=nombreMasLegible, y="Porcentaje") 
+  return(grafico) 
+  
+}
+
+
+```
+```{r}
+
+```
+
+
+```{r}
+inventarios <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
+                                     clientesQueGeneranMenorTicketsEntrada, "totalinventory")
+```
+
+```{r}
+graficar_datos(inventarios, "totalinventory", "Inventario total")
+```
+
+
+
+```{r}
+nombresLegibles <- c("Importaciones categorizadas", "Exportaciones categorizadas",
+                     "Cuentas por pagar", "Cuentas por cobrar",
+                     "Valor de inventarios", "Ventas fisicas", 
+                     "Ventas electronicas", "Rotacion de inventarios",
+                     "Rotacion de cuentas de pagar", "Rotacion de cuentas por cobrar",
+                     "Ciclo de negocio", "Ciclo financiero"
+                     )
+names(nombresLegibles) <- c("impo_cv", "expo_vt", 
+                            "cxp", "cxc", 
+                            "totalinventory", "tiene_ventas_fisicas",
+                            "tiene_ventas_electronicas", "rotacion_inventarios",
+                            "rotacion_cxc", "rotacion_cxp", 
+                            "ciclo_negocio", "ciclo_financiero"
+                            )
+```
+
+
+```{r}
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
+                                     clientesQueGeneranMenorTicketsEntrada, columna)
+  
+  print(graficar_datos(datosColumna, columna, nombresLegibles[[columna]]))
+}
+```
+
+
 
 
