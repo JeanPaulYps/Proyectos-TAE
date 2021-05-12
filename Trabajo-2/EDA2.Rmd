@@ -19,11 +19,7 @@ calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreC
   dataFrameConTotalYPorcentajes <- df %>% mutate(
                                               ColumnaTotal = rowSums(select(.,contains(regexColumnas))),
                                               ColumnaPorcentajes= ColumnaTotal/sum(ColumnaTotal)*100
-                                          ) #%>%
-                                          # setNames(
-                                          #   c("ColumnaTotal", "ColumnaPorcentajes"),
-                                          #   c(nombreColumnaTotal, nombreColumnaPorcentajes)
-                                          # ) 
+                                          ) 
   colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaTotal")] <- 
     nombreColumnaTotal
   colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaPorcentajes")] <- 
@@ -31,29 +27,6 @@ calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreC
                                           
   return(dataFrameConTotalYPorcentajes)
 }
-```
-
- 
-```{r}
-clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_vm")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100) %>% head(n=300) 
-sum(clientesConTicketsDeEntradaMasValiosos$totalPorcentaje)
-clientesConTicketsDeEntradaMasValiosos
-```
-
-```{r}
-mejoresClientes <- inner_join(datos, clientesConTicketsDeEntradaMasValiosos, by=c("nit" = "nit"))
-mejoresClientes
-```
-
-
-
-
-```{r}
-clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos))]  %>%  
-                                          mutate(total = rowSums(select(.,contains("en_vm")))) %>% 
-                                          arrange(desc(total)) %>% 
-                                          mutate(totalPorcentaje= total/sum(total)*100) %>%
-                                          filter(totalPorcentaje != 0) 
 ```
 
 
@@ -77,7 +50,7 @@ resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
     resumenDeMinoria <- dfMinoria %>%
       count(.dots=columna) %>%
       mutate(n = n/sum(n) * 100)
-    criterioJoin <- paste(columna, columna, sep=" = ")
+    
     resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
     return(resumenComparativo)
 }
@@ -134,11 +107,6 @@ graficar_datos <- function (df, columnaDf, nombreMasLegible)
 ```
 
 
-
-
-
-
-
 ```{r}
 nombresLegibles <- c("Importaciones categorizadas", "Exportaciones categorizadas",
                      "Cuentas por pagar", "Cuentas por cobrar",
@@ -169,5 +137,78 @@ for (columna in names(nombresLegibles))
 
 ```
 
+# Analisis clientes con mas transacciones de entrada mensuales 
 
+```{r}
+clientesConMasTransaccionesEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_transacciones_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_transacciones_de_entrada_cliente)) %>%
+                               head(n=80)
+clintesConMenosTransaccionesEntrada <- datosConPorcentajesYTotales %>%
+                                filter(total_transacciones_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_transacciones_de_entrada_cliente)) %>%
+                               slice(81: n())
+```
+
+
+```{r}
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesConMasTransaccionesEntrada, 
+                                     clintesConMenosTransaccionesEntrada, columna)
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
+}
+```
+
+# Analisis clientes con mas tickets de salida
+
+```{r}
+clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_salida_cliente)) %>%
+                               head(n=500)
+
+clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_salida_cliente)) %>%
+                               slice(501: n())
+```
+
+
+```{r}
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
+                                     clientesQueGeneranMenorTicketsSalida, columna)
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
+}
+```
+
+
+# Clientes con mas transacciones mensuales de salida 
+
+```{r}
+clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_transacciones_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_transacciones_de_salida_cliente)) %>%
+                               head(n=400)
+
+clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_transacciones_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_transacciones_de_salida_cliente)) %>%
+                               slice(401: n())
+```
+
+
+```{r}
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
+                                     clientesQueGeneranMenorTicketsSalida, columna)
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
+}
+```
 
