@@ -7,6 +7,8 @@ output:
 
 ```{r, warning=F, echo=F, include=F}
 library(tidyverse)
+library(gridExtra)
+library(cowplot)
 datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
 datos = datos[!duplicated(datos$nit),]
 ```
@@ -44,10 +46,6 @@ mejoresClientes
 ```
 
 
-```{r}
-table(mejoresClientes$ciclo_financiero)
-```
-
 
 
 ```{r}
@@ -56,7 +54,6 @@ clientesConTicketsDeEntradaMasValiosos <- datos[grep("nit|en_vm.*", names(datos)
                                           arrange(desc(total)) %>% 
                                           mutate(totalPorcentaje= total/sum(total)*100) %>%
                                           filter(totalPorcentaje != 0) 
-clientesConTicketsDeEntradaMasValiosos
 ```
 
 
@@ -97,16 +94,9 @@ clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
                                filter(total_tickets_de_entrada_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_entrada_cliente)) %>%
                                slice(301: n())
-sum(clientesQueGeneranLaMayoriaTicketsEntrada$porcentaje_de_tickets_de_entrada_cliente)
-sum(clientesQueGeneranMenorTicketsEntrada$porcentaje_de_tickets_de_entrada_cliente)
 ```
 
 
-
-```{r}
-table(clientesQueGeneranLaMayoriaTicketsEntrada$impo_cv) 
-table(clientesQueGeneranMenorTicketsEntrada$impo_cv)
-```
 
 
 
@@ -123,29 +113,6 @@ ImpoCVMinoria <- clientesQueGeneranMenorTicketsEntrada %>%
 ```
 
 
-
-
-```{r}
-ImpoCV <- ImpoCVMayoria %>% inner_join(ImpoCVMinoria, by=c("impo_cv" = "impo_cv"))
-ggplot(data=reshape2::melt(ImpoCV, id.vars = "impo_cv"), aes(x=impo_cv, y=value, fill=variable)) +
-  geom_bar(stat="identity", position=position_dodge()) + 
-  scale_fill_discrete(name = "ImpoCV", labels = c("ImpoCV mayoria", "ImpoCV minoria")) +
-  labs(title="Porcentaje de importaciones por cada subgrupo", x="ImpoCV", y="Porcentaje") 
-
-```
-
-```{r}
-columnasCategoricas = c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory",  "tiene_ventas_fisicas",
-                        "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc", 
-                        "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
-for (columna in columnasCategoricas)
-{
-  print(resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
-                                     clientesQueGeneranMenorTicketsEntrada, columna))
-}
-```
-
-
 ```{r}
 
 
@@ -155,29 +122,20 @@ graficar_datos <- function (df, columnaDf, nombreMasLegible)
   etiquetaMayoria <- sprintf("%s mayoria", nombreMasLegible)
   etiquetaMinoria <- sprintf("%s minoria", nombreMasLegible)
   datos <- reshape2::melt(df, id.vars=columnaDf)
-  grafico <- ggplot(data=datos, aes(x=columnaDf, y=value, fill=variable)) +
+  grafico <- ggplot(data=datos, aes(x=.data[[columnaDf]], y=value, fill=variable)) +
           geom_bar(stat="identity", position=position_dodge()) + 
           scale_fill_discrete(name = nombreMasLegible, labels = c(etiquetaMayoria, etiquetaMinoria)) +
-          labs(title=titulo, x=nombreMasLegible, y="Porcentaje") 
+          labs(title=titulo, x=nombreMasLegible, y="Porcentaje") + 
+          theme(legend.position = "top")
   return(grafico) 
   
 }
 
-
-```
-```{r}
-
 ```
 
 
-```{r}
-inventarios <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
-                                     clientesQueGeneranMenorTicketsEntrada, "totalinventory")
-```
 
-```{r}
-graficar_datos(inventarios, "totalinventory", "Inventario total")
-```
+
 
 
 
@@ -199,16 +157,17 @@ names(nombresLegibles) <- c("impo_cv", "expo_vt",
 ```
 
 
-```{r}
+```{r fig.ncol=2, fig.align='center', out.height='25%'}
+
 for (columna in names(nombresLegibles))
 {
   datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsEntrada, 
                                      clientesQueGeneranMenorTicketsEntrada, columna)
-  
-  print(graficar_datos(datosColumna, columna, nombresLegibles[[columna]]))
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
 }
-```
 
+```
 
 
 
