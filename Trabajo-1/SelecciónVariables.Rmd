@@ -78,6 +78,7 @@ library(knitr)
 library(psych)
 library(caret)
 library(tidyverse)
+library(corrplot)
 ```
 
 ```{r}
@@ -465,6 +466,7 @@ A continuación se presentan diferentes propuestas de modelos, que se aplicaron 
 
 Por el tipo de variables, se crean variables dummy; con el objetivo de analizar cada nivel de cada variable, a continuación se presenta la tabla de análisis de Varianza ANOVA. 
 ```{r}
+datos_seleccionados=subset(datos,select =c("Nivel_educativo_jefe","Estado_civil_jefe","Grado_satisfaccion_de_vida_jefe","Numero_personas_por_casa","Hijos" ))
 modelo=lm(Hijos~Nivel_educativo_jefe+Estado_civil_jefe+Grado_satisfaccion_de_vida_jefe+Numero_personas_por_casa,data = datos_seleccionados)
 anova(modelo)
 ```
@@ -547,7 +549,9 @@ rmse<-sqrt(error)
 rmse
 ```
 
-$RMSE=0.6687$
+
+
+$RMSE=0.6669$
 
 El modelo de knn se logra implementar satisfactoriamente, con una Tasa de error de 0.6687, la cuál es aceptable. 
 
