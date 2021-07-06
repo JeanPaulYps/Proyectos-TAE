@@ -1,0 +1,266 @@
+---
+title: "ACP"
+author: '----'
+date: "11/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(fastDummies)
+library(factoextra)
+library(cluster)
+```
+
+
+
+```{r}
+
+
+data<-read.table("base_trabajo_segmentacion.csv" ,sep = ";",header = TRUE)
+data<-na.omit(data)
+
+#Modificando las variables
+datos_reducidos=mutate(data, en_vm_otros_ = en_vm_canal6+en_vm_canal7+en_vm_canal8+en_vm_canal9+en_vm_canal10+en_vm_otros,en_tx_otros_=en_tx_canal6+en_tx_canal7+en_tx_canal8+en_tx_canal9+en_tx_canal10+en_tx_otros)
+
+
+
+
+borrar <- c("nit","en_vm_canal6","en_vm_canal7","en_vm_canal8","en_vm_canal9","en_vm_canal10","en_vm_otros","en_tx_canal6","en_tx_canal7","en_tx_canal8","en_tx_canal9","en_tx_canal10","en_tx_otros")
+datos2 <- datos_reducidos[ , !(names(datos_reducidos) %in% borrar)]#En este paso se eliminan las variables sumadas ateriormente
+
+datos_categoricos_seleccionados=datos2[19:34]#Se seleccionan y almacenan los datos categóricos
+
+datos_categoricos=c("impo_cv","expo_vt","cxp","cxc","totalinventory","pagos_pj","pagos_pn","tiene_ventas_fisicas","tiene_ventas_electronicas","recaudos_pj","recaudos_pn","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negocio","ciclo_financiero")
+
+datos_numericos <- datos2[ , !(names(datos2) %in% datos_categoricos)]#Para hacer los primeros análisi se dejan únicamente las variables cuantitativas del modelo
+```
+
+```{r}
+Sigma_t<-cov(scale(datos_numericos,center=T,scale=T))
+descomp_espectr_t<-eigen(Sigma_t)
+lambdas_t<-descomp_espectr_t$values
+D_t<-descomp_espectr_t$vectors
+```
+
+
+
+
+```{r}
+#En caso de ser necesario, se hará un análisis del ACP
+acprincipales=prcomp(datos_numericos,scale=T)
+acprincipales
+```
+
+```{r}
+#Qué % de variablidad es explicada para cada componente:
+prop_varianza <- acprincipales$sdev^2 / sum(acprincipales$sdev^2)
+prop_varianza*100
+```
+
+```{r}
+ggplot(data = data.frame(prop_varianza, pc = 1:20),
+       aes(x = pc, y = prop_varianza)) +
+  geom_col(width = 0.3) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw() +
+  labs(x = "Componente principal",
+       y = "Prop. de varianza explicada")
+```
+
+```{r}
+prop_varianza_acum <- cumsum(prop_varianza)
+prop_varianza_acum
+
+ggplot(data = data.frame(prop_varianza_acum, pc = 1:20),
+       aes(x = pc, y = prop_varianza_acum, group = 1)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  labs(x = "Componente principal",
+       y = "Prop. varianza explicada acumulada")
+```
+
+
+#Con las 9 primeras compoentes principales se explica el 87% de la variabilidad total
+```{r}
+#Datos proyectados con las 9 primeras componentes principales
+datos_proyectados=acprincipales$x#Acá está con todas sus componetes principales
+datos_proyectados_reducidos=datos_proyectados[,1:9]
+#Los vectores propios son los siguientes:
+vec_propios=acprincipales$rotation
+val_propios=lambdas_t
+
+```
+
+```{r}
+#Tomaremos únicamente los necesarios
+D_red_t<-vec_propios[,1:9]
+lambdas_red_t<-val_propios[1:9]
+
+```
+
+
+```{r}
+#Se recontruye la matriz de covarianzas escalada
+Sigma_rec_t<-D_red_t%*%diag(lambdas_red_t)%*%t(D_red_t)
+```
+
+## Reconstrucción de los datos originales a partir de la proyección en las nueve primeras componentes principales
+
+```{r}
+datos_reconstruidos_esc_cent_t<-datos_proyectados_reducidos%*%t(D_red_t)
+
+```
+
+#Ahora, se hace el clustering con las 9 compnentes principales
+```{r}
+#Recordemos que éstas están almacenadas en la varianle datos_proyectados_reducidos
+set.seed(1234)
+wcss <- vector()
+for(i in 1:20){
+  wcss[i] <- sum(kmeans(datos_proyectados_reducidos, i)$withinss)
+}
+```
+
+```{r}
+#Se verifica el número de centroides óptimo
+ggplot() + geom_point(aes(x = 1:20, y = wcss), color = 'blue') + 
+  geom_line(aes(x = 1:20, y = wcss), color = 'blue') + 
+  ggtitle("Método del Codo") + 
+  xlab('Cantidad de Centroides k') + 
+  ylab('WCSS')
+```
+
+```{r}
+#Enotro gráfico más bonito
+set.seed(3) # Se fija la semilla para obtener resultados reproducibles
+# Cálculo de los grupos
+centers <- 2:10 # este es el valor de K
+resultados <- vector(mode="list",length = 10) # en esta lista se almacenan los resultados de cada agrupamiento
+for (i in 1:length(centers)){
+  resultados[[i]] <- kmeans(x=datos_proyectados_reducidos,centers=centers[i],nstart = 3)
+}
+
+
+
+
+# Extracción de la métrica de desempeño ("withinss") para cada K:
+metrica_cl <- do.call("rbind",lapply(resultados,"[[",5))
+num_centros <- 2:10
+res_num_cen <- data.frame(num_centros,metrica_cl)
+grph_metrica_cl <- ggplot(res_num_cen,aes(x=num_centros,xend=num_centros,y=0,yend=metrica_cl))
+grph_metrica_cl + geom_point(aes(x=num_centros,y=metrica_cl)) +  geom_segment() + theme_bw() + labs(title = "Desempeño del agrupamiento \n en función de K",
+                                      x = "K (cantidad de centros)",
+                                      y = "Métrica de desempeño")
+```
+
+
+```{r}
+#Por ahora se seleccionan 5 grupos
+
+set.seed(123)
+for (i in 2:8){wines_K2 <- kmeans(datos_proyectados_reducidos, centers =i , nstart = 25)
+print(wines_K2$size)
+
+  
+}
+
+```
+
+
+```{r}
+set.seed(123)
+kmenas=kmeans(datos_proyectados_reducidos, centers =5 , nstart = 25)
+fviz_cluster(kmenas, data = datos_numericos)
+
+```
+
+
+
+```{r}
+
+dfPCA <- as.data.frame(acprincipales$x)
+dfPCA <- cbind(dfPCA, kmenas$cluster )
+dfPCA$`kmenas$cluster` <- as.factor(dfPCA$`kmenas$cluster`)
+dfPCA$`kmenas$cluster` <- fct_recode(dfPCA$`kmenas$cluster`, "Grupo 1" = "1", 
+                                     "Grupo 2" = "2",
+                                     "Grupo 3" = "3",
+                                     "Grupo 4" = "4",
+                                     "Grupo 5" = "5" )
+plotly::plot_ly(dfPCA, x=~PC1, y=~PC2, z=~PC3, color=dfPCA$`kmenas$cluster` )
+```
+
+
+```{r}
+fviz_pca_var(acprincipales, col.var = "cos2", 
+             labelsize = 2)
+```
+
+
+
+```{r}
+fviz_pca_biplot(acprincipales, geom="point", label="ind")
+```
+
+```{r}
+fviz_pca_biplot(acprincipales, geom="point", label="ind", col.ind = "cos2" )
+```
+
+```{r}
+fviz_pca_biplot(acprincipales, geom="point", label="ind", col.ind = "cos2", axes=c(1,3))
+```
+
+
+
+```{r}
+fviz_pca_biplot(acprincipales, label ="var", col.ind="cos2", axes=c(1,2))
+```
+
+
+```{r}
+ACP2 <- prcomp(datos_numericos %>% select(.,contains("en_vm")),scale=T) 
+```
+
+
+
+```{r}
+fviz_pca_biplot(ACP2, label ="var", col.ind="cos2", repel = T)
+```
+
+
+```{r}
+set.seed(1241212)
+canalesEntrada <- datos_numericos %>% select(.,contains("en_vm"))
+kmeansCanalesEntrada <- kmeans(canalesEntrada, 5)
+```
+
+```{r}
+fviz_cluster(kmeansCanalesEntrada, data=canalesEntrada)
+```
+
+
+```{r}
+fviz_contrib(acprincipales, choice = "var", axes = 1, top = 10)
+```
+
+```{r}
+fviz_contrib(acprincipales, choice = "var", axes = 2, top = 10)
+```
+
+
+```{r}
+fviz_contrib(acprincipales, choice = "var", axes = 3, top = 10)
+```
+
+```{r}
+fviz_contrib(acprincipales, choice = "var", axes = 4, top = 10)
+```
+
+
+

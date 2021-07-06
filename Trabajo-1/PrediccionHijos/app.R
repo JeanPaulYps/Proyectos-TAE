@@ -66,7 +66,8 @@ ui <- navbarPage("Prediccion hijos",
 </ul>
 <h2 id="mas-informaci-n">Mas información</h2>
 <p>Para leer el informe técnico <a href="https://rpubs.com/JeanPaulYps/776348">haz clic aquí</a></p>
-<p>Video de la aplicación</p>'
+<p>Video de la aplicación:</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LB3P0-kc5eM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block; margin: 0 auto;"></iframe>'
                              )
                               
                              
@@ -85,7 +86,7 @@ ui <- navbarPage("Prediccion hijos",
                                                         "Toda la primaria" = "Toda la primaria" ,
                                                         "Algunos años de secundaria" = "Algunos anios de secundaria",
                                                         "Toda la secundaria" = "Toda la secundaria",
-                                                        "Uno o mas anios de tecnica o tecnologica" = "Uno o mas años de tecnica o tecnologica",
+                                                        "Uno o mas años de tecnica o tecnologica" = "Uno o mas anios de tecnica o tecnologica",
                                                         "Tecnica o tecnologica completa" = "Tecnica o tecnologica completa",
                                                         "Uno o mas años de universidad" ="Uno o mas anios de universidad",
                                                         "Universitaria completa" = "Universitaria completa"
@@ -100,7 +101,7 @@ ui <- navbarPage("Prediccion hijos",
                                                         "Toda la primaria" = "Toda la primaria" ,
                                                         "Algunos años de secundaria" = "Algunos anios de secundaria",
                                                         "Toda la secundaria" = "Toda la secundaria",
-                                                        "Uno o mas anios de tecnica o tecnologica" = "Uno o mas años de tecnica o tecnologica",
+                                                        "Uno o mas años de tecnica o tecnologica" = "Uno o mas anios de tecnica o tecnologica",
                                                         "Tecnica o tecnologica completa" = "Tecnica o tecnologica completa",
                                                         "Uno o mas años de universidad" ="Uno o mas anios de universidad",
                                                         "Universitaria completa" = "Universitaria completa"
@@ -196,7 +197,7 @@ server <- function(input, output) {
             ". Con el grado de escolaridad de la madre de la pareja ", tolower(input$Escolaridad_madre_pareja), 
             ". Con el nivel educativo de pareja ", tolower(input$Nivel_educativo_pareja),
             ". Con el grado de satisfaccion de pareja con valor ", tolower(input$Grado_satisfaccion_de_vida_pareja),
-            ". Con ", input$Numero_personas_por_casa, " personas en casa")
+            ". Con ", input$Numero_personas_por_casa, " personas en casa", sep="")
     })
 
 }

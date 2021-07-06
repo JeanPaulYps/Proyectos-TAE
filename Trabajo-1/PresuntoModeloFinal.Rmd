@@ -1,0 +1,152 @@
+---
+title: "Trabajo 1:TAE"
+author: "Laura Daniela Hoyos Peña, Jean Paul, Hans, Juan Camilo"
+date: "Abril del 2021"
+output: html_document
+---
+
+
+```{r}
+library(psych)
+library(caret)
+library(tidyverse)
+library(class)
+```
+
+```{r}
+datos<-read.csv("VariablesEntrada.csv",header = TRUE,sep = ",")#39602 observaciones
+datos<-na.omit(datos, na.action="omit")#19323 observaciones
+```
+
+###MODELOS
+
+##KNN
+
+```{r}
+datos_sel <- datos %>% 
+  select(c('Nivel_educativo_jefe','Estado_civil_jefe','Grado_satisfaccion_de_vida_jefe','Hijos','Numero_personas_por_casa')) %>%
+    mutate(Nivel_educativo_jefe = as.data.frame(dummy.code(Nivel_educativo_jefe))) %>%
+    mutate(Estado_civil_jefe = as.data.frame(dummy.code(Estado_civil_jefe)))  
+```
+
+
+```{r}
+numero<-123456789
+set.seed(numero)
+subset<-sample((1:nrow(datos)), (nrow(datos)/2)+1)
+#datos_sel <- subset(datos,select = #c('Nivel_educativo_jefe','Estado_civil_jefe','Grado_satisfaccion_de_vida_jefe','Hijos','Numero_personas_por_casa'))
+Train<-datos_sel[subset,] #9662 datos Entrena
+Test<-datos_sel[-subset,] #9661 datos Validación
+Train1<-Train[,-4]
+Test1<-Test[,-4]
+y_Train<-Train$Hijos
+y_Test<-Test$Hijos
+```
+
+```{r}
+library(FNN)
+
+mod<-knnreg(Train1,test=NULL,y=y_Train,k=18,algorithm=c("kd_tree", 
+        "cover_tree", "brute"))
+summary(mod)
+```
+
+###KNN
+##Selección del K óptimo
+
+```{r,warning=FALSE,message=FALSE}
+
+cv10<-trainControl(method='cv',number = 10)
+set.seed(123456789)
+fit<-train(Hijos~Nivel_educativo_jefe+Grado_satisfaccion_de_vida_jefe+Estado_civil_jefe+Numero_personas_por_casa,
+method = 'knn',
+tuneGrid = expand.grid(k=1:20),
+trControl = cv10,
+metric = "RMSE",
+data = datos)
+fit
+```
+
+
+
+#K=18
+```{r}
+mod_knn_train<-knn(train=Train1,test=Train1,cl=y_Train,k=18,prob = TRUE)
+mod_knn_test<-knn(train=Train1,test=Test1,cl=y_Train,k=18)
+summary(mod_knn_test)
+summary(mod_knn_train)
+summary(as.factor(y_Train))
+matriz_confusion<-confusionMatrix(mod_knn_train, as.factor(y_Train))
+matriz_confusion$table
+error_knn<-1-matriz_confusion$overall['Accuracy']
+names(error_knn) <- 'Tasa de error'
+error_knn #Tasa de error
+```
+```{r,out.height=10,out.width=10}
+matriz_confusion
+```
+
+
+
+
+
+
+```{r}
+summary(as.factor(datos$Hijos))
+```
+#######modelo regresion lineal
+```{r}
+datos_seleccionados=subset(datos,select =c("Nivel_educativo_jefe","Estado_civil_jefe","Grado_satisfaccion_de_vida_jefe","Numero_personas_por_casa","Hijos" ))
+
+modelo=lm(Hijos~Nivel_educativo_jefe+Estado_civil_jefe+Grado_satisfaccion_de_vida_jefe+Numero_personas_por_casa,data = datos_seleccionados)
+summary(modelo)
+```
+
+```{r}
+anova(modelo)
+```
+```{r}
+plot(modelo)
+```
+
+##modelo transoformado
+
+```{r}
+#MODELO HIJOS AL CUADRADO
+Hijos2<-datos_seleccionados$Hijos^{2}
+modelo_H2=lm(Hijos2~Nivel_educativo_jefe+Estado_civil_jefe+Grado_satisfaccion_de_vida_jefe+Numero_personas_por_casa,data = datos_seleccionados)
+summary(modelo_H2)
+```
+```{r}
+anova(modelo_H2)
+```
+```{r}
+plot(modelo_H2)
+```
+
+#####transformación box cox 
+```{r}
+library(MASS)
+# Usando la funcion boxcox() sobre el modelo ajustado tenemos:
+
+bc <- boxcox(modelo)
+# Para encontrar el valor de lambda que maximiza log-likelihood hacemos
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+```{r}
+Hijos_boxcox<-datos_seleccionados$Hijos^{lambda}
+modelo_boxcox=lm(Hijos_boxcox~Nivel_educativo_jefe+Estado_civil_jefe+Grado_satisfaccion_de_vida_jefe+Numero_personas_por_casa,data = datos_seleccionados)
+summary(modelo_boxcox)
+```
+```{r}
+anova(modelo_boxcox)
+```
+```{r}
+plot(modelo_boxcox)
+```
+
+#modelo de regresion knn
+
+
+

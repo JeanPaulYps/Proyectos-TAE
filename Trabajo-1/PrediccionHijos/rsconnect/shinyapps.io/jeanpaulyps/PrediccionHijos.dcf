@@ -5,8 +5,8 @@ account: jeanpaulyps
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3915303
-bundleId: 4435630
+bundleId: 4702133
 url: https://jeanpaulyps.shinyapps.io/PrediccionHijos/
-when: 1617678563.02378
+when: 1623347415.929
 asMultiple: FALSE
 asStatic: FALSE

@@ -1,0 +1,67 @@
+---
+title: "Trabajo_2_Resumido"
+author: "--"
+date: "27/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(fastDummies)
+library(factoextra)
+library(cluster)
+datos=read.table(file.choose(),header = T,dec=".",sep = ";")
+datos_=na.omit(datos)
+```
+
+```{r}
+set.seed(1680)
+# calculo de las distencias por medio del petodo Gower de la funcion daisy
+datos=datos[-1]
+#distancia_gower=daisy(datos,metric = "gower",type = list(ordratio=c("impo_cv","expo_vt","cxp","cxc","totalinventory","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negiocio","ciclo_financiero"),asymm=c("tiene_ventas_fisicas","tiene_ventas_electronicas")))
+
+distancia_gower=daisy(datos,metric = "gower",stand = TRUE,type = list(ordratio=c("impo_cv", "expo_vt","cxp","cxc","totalinventory","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negocio","ciclo_financiero"),asymm=c("tiene_ventas_fisicas","tiene_ventas_electronicas")))
+
+image(t(as.matrix(distancia_gower)))
+
+D_Tot=as.matrix(distancia_gower)
+
+```
+
+
+```{r}
+cluster_jerar <- hclust(d=distancia_gower,method = "complete")
+cluster_jerar
+plot(cluster_jerar)
+cluster_jerar_2=hclust(d=distancia_gower,method = "ward.D")
+plot(cluster_jerar_2)
+cluster_jerar_3=hclust(d=distancia_gower,method = "ward.D2")
+plot(cluster_jerar_3)
+```
+
+#Se identifican 4 grupos potenciales
+```{r}
+etiqueta_grupo <- cutree(cluster_jerar_3,k=4)
+table(etiqueta_grupo)
+
+
+```
+
+#Ahora se realiza el análisis de cada grupo
+```{r}
+summary(datos[etiqueta_grupo==1,])
+```
+
+# Guardar datos para el analisis
+
+```{r}
+datosParaAnalisis = datos
+datosParaAnalisis["grupo"] = etiqueta_grupo
+write.table(datosParaAnalisis, "SegmentacionJerarquica.csv", row.names = F, sep=";")
+```
+
+
