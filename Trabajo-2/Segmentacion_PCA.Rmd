@@ -262,5 +262,12 @@ fviz_contrib(acprincipales, choice = "var", axes = 3, top = 10)
 fviz_contrib(acprincipales, choice = "var", axes = 4, top = 10)
 ```
 
+# Guardar los datos para el analisis
+
+```{r}
+datosParaAnalisis = data
+datosParaAnalisis["grupo"] = kmenas$cluster
+write.table(datosParaAnalisis, "SegmentacionPCA.csv", row.names = F, sep=";")
+```
 
 
