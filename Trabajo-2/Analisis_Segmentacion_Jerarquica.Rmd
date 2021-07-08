@@ -1,0 +1,103 @@
+---
+title: "Analisis segmentacion jerarquica"
+output: html_notebook
+---
+
+
+
+# Analisis por canales
+
+```{r, warning=F, echo=F, include=F}
+library(tidyverse)
+datos = read.csv("SegmentacionJerarquica.csv", sep=";") 
+```
+
+```{r}
+totalPorGrupos <- datos %>% group_by(grupo) %>% 
+                  summarise(across(everything(), sum))
+totalPorGrupos
+```
+
+
+```{r}
+grupo <- c(1,2,3,4)
+renombrarColumnas <- function(dataFrame, regexColumnas, nombresNuevos)
+{
+  return (dataFrame[grep(regexColumnas, names(dataFrame))] %>% 
+                               setNames(nombresNuevos))
+}
+
+calcularPorcentajes <- function(dataFrame)
+{
+  return (dataFrame/ sum(dataFrame) * 100)
+}
+
+agregarColumnaDeGrupos <- function(dataFrame)
+{
+  grupo <- c("Grupo 1", "Grupo 2", "Grupo 3", "Grupo 4")
+  return(cbind(grupo, dataFrame))
+}
+
+agregarColumnaDeTipoTicket <- function(dataFrame, tipoDeTicket)
+{
+  return(cbind(dataFrame, tipoDeTicket))
+}
+
+regexTiquetDeEntrada = "en_vm.*"
+nombresDeCanalesDeEntrada = c("Canal 1", "Canal 2", 
+                           "Canal 3", "Canal 4",
+                           "Canal 5", "Canal 6",     
+                           "Canal 7", "Canal 8",
+                           "Canal 9", "Canal 10",
+                           "Otros canales")
+TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() %>%
+                                agregarColumnaDeTipoTicket("Ticket de entrada")
+
+regexTransaccionesDeEntrada = "en_tx.*"
+transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTransaccionesDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() %>%
+                                agregarColumnaDeTipoTicket("Transacciones de entrada")
+
+
+regexTiquetDeSalida ="sal_vm.*"
+nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
+ticketsDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() %>%
+                                agregarColumnaDeTipoTicket("Ticket de salida")
+```
+```{r}
+TiquetsDeEntradaEnPorcentajes
+```
+```{r}
+ggplot(data=reshape2::melt(TiquetsDeEntradaEnPorcentajes, id.vars = "grupo"), aes(x=variable, y=value, fill=grupo)) + 
+  geom_bar(width = 0.7, stat="identity", position="stack") 
+```
+```{r}
+transaccionesDeEntradaEnPorcentajes
+```
+
+```{r}
+test <- rbind(transaccionesDeEntradaEnPorcentajes, TiquetsDeEntradaEnPorcentajes)
+
+```
+```{r}
+test
+```
+```{r}
+test <- rbind(reshape2::melt(ticketsDeSalidaEnPorcentajes),
+reshape2::melt(TiquetsDeEntradaEnPorcentajes),
+reshape2::melt(transaccionesDeEntradaEnPorcentajes)
+)
+
+
+```
+```{r}
+ggplot(data=test, aes(x=variable, y=value, fill=grupo)) + 
+   geom_bar(width = 0.7, stat="identity", position="stack") 
+```
+
+
