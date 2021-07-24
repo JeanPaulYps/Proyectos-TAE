@@ -1,0 +1,681 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+---
+
+
+
+```{r}
+library(tidyverse)
+library(gridExtra)
+library(cowplot)
+library(fastDummies)
+library(factoextra)
+library(cluster)
+library(dplyr)
+```
+
+
+#  Analisis exploratorio de datos
+
+```{r, warning=F, echo=F, include=F}
+datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
+```
+
+```{r, echo=F}
+verTablaResumenPorCategoria <- function(df, titulo, titulosColumnas)
+{
+  tablaResumen <- df[, order(colSums(df), decreasing = T)] %>%
+                  colSums() %>% 
+                  format(scientific = F, big.mark = ",") %>%
+                  knitr::kable(caption = titulo, col.names = titulosColumnas )
+  return(tablaResumen)
+}
+
+obtenerTotalPorCategoria <- function(df)
+{
+  totalPorCategoria <- colSums(df)
+  return(totalPorCategoria)
+}
+
+obtenerTotalPorCategoriaEnPorcentajes <- function(df)
+{
+  total <- obtenerTotalPorCategoria(df)
+  totalPorCategoriaEnPorcentaje <- total/sum(total) * 100
+  totalPorCategoriaEnPorcentaje <- round(totalPorCategoriaEnPorcentaje, 2)
+  return(totalPorCategoriaEnPorcentaje)
+}
+
+
+crearAnalisisDescriptivoDeTickets <- function () 
+{
+  return(0)
+}
+
+```
+
+
+## Analisis variables númericas
+
+### Analisis descriptivo del valor promedio de los tickets de entrada
+
+
+```{r}
+valorPromedioTicketEntrada <-  datos[grep("en_vm.*", names(datos))] %>% 
+                               setNames(c("Canal 1",
+                                          "Canal 2",
+                                          "Canal 3",
+                                          "Canal 4",
+                                          "Canal 5",
+                                          "Canal 6",
+                                          "Canal 7",
+                                          "Canal 8",
+                                          "Canal 9",
+                                          "Canal 10",
+                                          "Otros canales"))
+```
+
+
+```{r}
+tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(valorPromedioTicketEntrada, "Valor promedio del ticket de entrada por canal", c("ValorTotalPorCanales"))
+tablaResumenTicketPromedioDeEntrada
+```
+
+
+
+
+
+```{r}
+#Total por porcentaje en cada canal
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
+```
+
+
+
+
+### Analisis de transacciones promedio por canal
+
+
+```{r}
+transaccionesPromedioPorCanal <-  datos[grep("en_tx.*", names(datos))] %>% 
+                               setNames(c("Canal 1","Canal 2",
+                                          "Canal 3","Canal 4",
+                                          "Canal 5","Canal 6",
+                                          "Canal 7","Canal 8",
+                                          "Canal 9","Canal 10",
+                                          "Otros canales"))
+```
+
+```{r}
+tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(transaccionesPromedioPorCanal, "Transacciones promedio de entrada por canal", c("Valor total por canal"))
+tablaResumenTicketPromedioDeEntrada
+```
+
+
+
+
+
+```{r}
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal), caption="Porcentaje de transacciones por canal", col.names="Porcentaje por canal")
+```
+
+
+
+### Valor del ticket promedio de salida
+
+```{r}
+valorTicketPromedioSalida <-  datos[grep("sal_vm.*", names(datos))] %>% 
+                               setNames(c("Canal 5","Canal 2",
+                                          "Canal 8","Otros canales"))
+valorTicketPromedioSalida
+```
+
+
+```{r}
+tablaResumenTransaccionesDeSalida <- verTablaResumenPorCategoria(valorTicketPromedioSalida, "Valor promedio del ticket de salida por canal", c("ValorTotalPorCanales"))
+tablaResumenTransaccionesDeSalida
+```
+
+
+
+
+
+
+```{r}
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
+```
+
+
+
+
+### Transacciones promedio anuales de salida  
+
+
+```{r}
+transaccionesPromedioDeSalida <-  datos[grep("sal_tx.*", names(datos))] %>% 
+                               setNames(c("Canal 5","Canal 2",
+                                          "Canal 8","Otros canales"))
+transaccionesPromedioDeSalida
+```
+
+
+```{r}
+verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Transacciones promedio de salida", "Dinero total de salida")
+```
+
+
+
+
+```{r}
+
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida), caption="Porcentaje de valor mensual por canal", col.names="Porcentaje por canal")
+```
+
+
+
+
+
+
+
+### Comparación de trafico por cada canal
+
+
+
+```{r}
+# Obtener los porcentajes por cada tipo de ticket
+porcentajePorTicketDeEntrada <- obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada)
+porcentajePorTransaccionesPromedioEntrada <- obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal)
+porcentajePorTicketDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida)
+porcentajePromedioDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida)
+```
+
+```{r}
+# Ajustar los nombres de los tickets de salida
+porcentajePorTicketDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
+                                           porcentajePorTicketDeSalida=porcentajePorTicketDeSalida)
+porcentajePromedioDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
+                                          porcentajePromedioDeSalida=porcentajePromedioDeSalida)
+```
+
+```{r}
+# Ajustar los nombres de los tickets de entrada
+infoCanalesPorcentajes <- data.frame(canal = c("Canal 1","Canal 2",
+                            "Canal 3","Canal 4",
+                            "Canal 5","Canal 6",
+                            "Canal 7","Canal 8",
+                            "Canal 9","Canal 10",
+                            "Otros canales"))
+infoCanalesPorcentajes$porcentajePorTicketDeEntrada = porcentajePorTicketDeEntrada
+infoCanalesPorcentajes$porcentajePorTransaccionesPromedioEntrada = porcentajePorTransaccionesPromedioEntrada
+```
+
+```{r}
+#Unir todos los porcentajes en un solo dataFrame
+infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") 
+infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePromedioDeSalida, by="canal") 
+infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything(), .fns = ~replace_na(.,0))) 
+```
+
+
+```{r}
+# Prueba para hacer ajustes de formato
+left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") %>% mutate_all(funs(replace_na(.,0)))
+```
+
+
+
+
+```{r}
+# Grafica de porcentaje de transacciones por categoria
+ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=canal, y=value, fill=variable)) +
+  geom_bar(width = 0.7, stat="identity", position=position_dodge()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  labs(title="Porcentaje de dinero por cada categoria por cada canal", x="Canales", y="Porcentaje") 
+  #coord_flip()
+```
+
+
+
+
+
+##  Variables categoricas
+
+```{r, warning=F, echo=F, include=F}
+
+datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
+```
+
+```{r}
+# Funcion para crear una nueva columna con el porcentaje de las transacciones que ese cliente genera 
+calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreColumnaPorcentajes)
+{
+  dataFrameConTotalYPorcentajes <- df %>% mutate(
+                                              ColumnaTotal = rowSums(select(.,contains(regexColumnas))),
+                                              ColumnaPorcentajes= ColumnaTotal/sum(ColumnaTotal)*100
+                                          ) 
+  colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaTotal")] <- 
+    nombreColumnaTotal
+  colnames(dataFrameConTotalYPorcentajes)[which(names(dataFrameConTotalYPorcentajes) == "ColumnaPorcentajes")] <- 
+    nombreColumnaPorcentajes
+                                          
+  return(dataFrameConTotalYPorcentajes)
+}
+```
+
+
+```{r}
+# Calcular los porcentajes para cada tipo de ticket
+datosConPorcentajesYTotales <-  datos %>% 
+  calcularTotalPorFilas("en_vm", "total_tickets_de_entrada_cliente", "porcentaje_de_tickets_de_entrada_cliente") %>%
+  calcularTotalPorFilas("en_tx", "total_transacciones_de_entrada_cliente", "porcentaje_transacciones_de_entrada_cliente") %>%
+  calcularTotalPorFilas("sal_vm", "total_tickets_de_salida_cliente", "porcentaje_tickets_de_salida_cliente") %>% 
+  calcularTotalPorFilas("sal_tx", "total_transacciones_de_salida_cliente", "porcentaje_transacciones_de_salida_cliente") 
+```
+
+
+```{r}
+# Genera un dataFrame donde compara el top 80% con el resto 
+resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
+{
+    resumenDeMayoria <- dfMayoria %>%
+      count(.dots=columna) %>%
+      mutate(n = n/sum(n) * 100)
+    
+    resumenDeMinoria <- dfMinoria %>%
+      count(.dots=columna) %>%
+      mutate(n = n/sum(n) * 100)
+    
+    resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
+    return(resumenComparativo)
+}
+```
+
+
+
+```{r}
+# Se sacan los 300 mejores clientes que es la cantidad que genera el 80% de las transacciones
+clientesQueGeneranLaMayoriaTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               head(n=300)
+clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               slice(301: n())
+```
+
+
+
+
+```{r}
+# Se escogen nombres que sean mas entendibles para el que lee el reporte
+nombresLegibles <- c("Importaciones categorizadas", "Exportaciones categorizadas",
+                     "Cuentas por pagar", "Cuentas por cobrar",
+                     "Valor de inventarios", "Ventas fisicas", 
+                     "Ventas electronicas", "Rotacion de inventarios",
+                     "Rotacion de cuentas de pagar", "Rotacion de cuentas por cobrar",
+                     "Ciclo de negocio", "Ciclo financiero"
+                     )
+names(nombresLegibles) <- c("impo_cv", "expo_vt", 
+                            "cxp", "cxc", 
+                            "totalinventory", "tiene_ventas_fisicas",
+                            "tiene_ventas_electronicas", "rotacion_inventarios",
+                            "rotacion_cxc", "rotacion_cxp", 
+                            "ciclo_negocio", "ciclo_financiero"
+                            )
+```
+
+
+```{r}
+# Grafica los datos de una columna seleccionada
+graficar_datos <- function (df, columnaDf, nombreMasLegible)
+{
+  titulo <- sprintf("Porcentaje de %s para cada subgrupo", nombreMasLegible)
+  etiquetaMayoria <- sprintf("%s mayoria", nombreMasLegible)
+  etiquetaMinoria <- sprintf("%s minoria", nombreMasLegible)
+  datos <- reshape2::melt(df, id.vars=columnaDf)
+  grafico <- ggplot(data=datos, aes(x=.data[[columnaDf]], y=value, fill=variable)) +
+          geom_bar(stat="identity", position="stack") + 
+          scale_fill_discrete(name = nombreMasLegible, labels = c(etiquetaMayoria, etiquetaMinoria)) +
+          labs(title=titulo, x=nombreMasLegible, y="Porcentaje") + 
+          theme(legend.position = "top")
+  return(grafico) 
+  
+}
+
+```
+
+
+## Analisis clientes con mas tickets de salida
+
+
+
+```{r}
+# Con 500 clientes se genera el 80% de tickets de salida
+clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_salida_cliente)) %>%
+                               head(n=500)
+
+clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_salida_cliente)) %>%
+                               slice(501: n())
+```
+
+
+```{r}
+# Compara las variables categoricas
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
+                                     clientesQueGeneranMenorTicketsSalida, columna)
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
+}
+```
+
+
+
+#  Segmentacion jerarquica
+
+
+
+```{r}
+
+
+data<-read.table("base_trabajo_segmentacion.csv",sep = ";",header = TRUE)
+data<-na.omit(data)
+
+#Modificando las variables
+datos_reducidos=mutate(data, en_vm_otros_ = en_vm_canal6+en_vm_canal7+en_vm_canal8+en_vm_canal9+en_vm_canal10+en_vm_otros,en_tx_otros_=en_tx_canal6+en_tx_canal7+en_tx_canal8+en_tx_canal9+en_tx_canal10+en_tx_otros)
+
+
+
+
+borrar <- c("nit","en_vm_canal6","en_vm_canal7","en_vm_canal8","en_vm_canal9","en_vm_canal10","en_vm_otros","en_tx_canal6","en_tx_canal7","en_tx_canal8","en_tx_canal9","en_tx_canal10","en_tx_otros")
+datos2 <- datos_reducidos[ , !(names(datos_reducidos) %in% borrar)]#En este paso se eliminan las variables sumadas ateriormente
+
+datos_categoricos_seleccionados=datos2[19:34]#Se seleccionan y almacenan los datos categóricos
+
+datos_categoricos=c("impo_cv","expo_vt","cxp","cxc","totalinventory","pagos_pj","pagos_pn","tiene_ventas_fisicas","tiene_ventas_electronicas","recaudos_pj","recaudos_pn","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negocio","ciclo_financiero")
+
+datos_numericos <- datos2[ , !(names(datos2) %in% datos_categoricos)]#Para hacer los primeros análisi se dejan únicamente las variables cuantitativas del modelo
+```
+
+```{r}
+Sigma_t<-cov(scale(datos_numericos,center=T,scale=T))
+descomp_espectr_t<-eigen(Sigma_t)
+lambdas_t<-descomp_espectr_t$values
+D_t<-descomp_espectr_t$vectors
+```
+
+```{r}
+#En caso de ser necesario, se hará un análisis del ACP
+acprincipales=prcomp(datos_numericos,scale=T)
+```
+
+```{r}
+#Qué % de variablidad es explicada para cada componente:
+prop_varianza <- acprincipales$sdev^2 / sum(acprincipales$sdev^2)
+prop_varianza*100
+```
+
+
+```{r}
+prop_varianza_acum <- cumsum(prop_varianza)
+prop_varianza_acum
+
+ggplot(data = data.frame(prop_varianza_acum, pc = 1:20),
+       aes(x = pc, y = prop_varianza_acum, group = 1)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  labs(x = "Componente principal",
+       y = "Prop. varianza explicada acumulada")
+```
+
+
+```{r, warning=F, echo=F}
+datos_proyectados = acprincipales$x
+
+grupo = read.csv("SegmentacionJerarquica.csv", sep=";")  %>% select(grupo)
+grupo = grupo %>% mutate(grupo = as.factor(grupo))
+#grupo = as.vector(grupo)
+PC1 = datos_proyectados[,1]
+PC2 = datos_proyectados[,2]
+PC3 = datos_proyectados[,3]
+#cbind(grupo, pC)
+
+plotly::plot_ly( x=~PC1, y=~PC2, z=~PC3, color=grupo$grupo )
+```
+
+#  Analisis segmentacion jerarquica
+
+```{r, warning=F, echo=F, include=F}
+datos = read.csv("SegmentacionJerarquica.csv", sep=";") 
+```
+
+```{r}
+# Obtener el total por grupo y canal
+totalPorGrupos <- datos %>% group_by(grupo) %>% 
+                  summarise(across(everything(), sum))
+totalPorGrupos
+```
+
+
+```{r}
+grupo <- c(1,2,3,4)
+
+#Funcion que cambia el nombre a las columnas que cumplan con el REGEX
+renombrarColumnas <- function(dataFrame, regexColumnas, nombresNuevos)
+{
+  return (dataFrame[grep(regexColumnas, names(dataFrame))] %>% 
+                               setNames(nombresNuevos))
+}
+
+# Calcula el porcentaje en un DataFrame numerico
+calcularPorcentajes <- function(dataFrame)
+{
+  return (dataFrame/ sum(dataFrame) * 100)
+}
+
+# Une la columna de grupos al DataFrame
+agregarColumnaDeGrupos <- function(dataFrame)
+{
+  Grupo <- c("Grupo 1", "Grupo 2", "Grupo 3", "Grupo 4")
+  return(cbind(Grupo, dataFrame))
+}
+
+# Esto era para un experimento. Agrega el tipo de ticket a un DataFrame 
+agregarColumnaDeTipoTicket <- function(dataFrame, tipoDeTicket)
+{
+  return(cbind(dataFrame, tipoDeTicket))
+}
+
+
+# Los nuevos nombres de los canales 
+nombresDeCanalesDeEntrada = c("Canal 1", "Canal 2", 
+                           "Canal 3", "Canal 4",
+                           "Canal 5", "Canal 6",     
+                           "Canal 7", "Canal 8",
+                           "Canal 9", "Canal 10",
+                           "Otros canales")
+
+nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
+
+# Pone nombres mas legibles a los canales y calcula los porcentajes que genera cada grupo
+
+# Modifica los tickets de entrada
+
+regexTiquetDeEntrada = "en_vm.*"
+
+TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos()
+
+# Modifica las transacciones de entrada
+
+regexTransaccionesDeEntrada = "en_tx.*"
+
+transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTransaccionesDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+
+
+
+# Modfica los tiquets de salida
+
+regexTiquetDeSalida ="sal_vm.*"
+
+ticketsDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+
+# Modifica las transacciones de salida
+regexTiquetDeSalida ="sal_tx.*"
+transaccionesDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+```
+```{r}
+# DataFrame resultante del proceso anterior
+TiquetsDeEntradaEnPorcentajes
+```
+```{r}
+
+graficarPorcentajesDeClientesEnCanales <- function  (dataFrame, tipoDeTiquet)
+{
+  grafica <- ggplot(data=reshape2::melt(dataFrame, id.vars ="Grupo"), aes(x=variable, y=value, fill=Grupo)) + 
+            geom_bar(width = 0.7, stat="identity", position="stack") +
+            labs(title= paste("Porcentaje de ventas", tipoDeTiquet,  "por cada grupo en cada canal"),
+                 x="Canales", y="Porcentaje de clientes") + 
+            theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+  return(grafica)
+}
+
+plot(graficarPorcentajesDeClientesEnCanales(TiquetsDeEntradaEnPorcentajes, "de ticket de entrada"))
+
+```
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeEntradaEnPorcentajes, "de transacciones de entrada"))
+```
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(ticketsDeSalidaEnPorcentajes, "de tickets de salida"))
+```
+
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeSalidaEnPorcentajes, "de transacciones de salida"))
+transaccionesDeSalidaEnPorcentajes
+```
+```{r}
+datos %>% group_by(as.factor(grupo)) %>%  count(as.factor(impo_cv))
+```
+
+
+
+
+
+```{r}
+# Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
+datosConFactores <-  datos %>%
+  mutate(
+    impo_cv = as.factor(impo_cv),
+    expo_vt = as.factor(expo_vt),
+    cxp = as.factor(cxp),
+    cxc = as.factor(cxc),
+    totalinventory = as.factor(totalinventory),
+    tiene_ventas_fisicas = as.factor(tiene_ventas_fisicas),
+    tiene_ventas_electronicas = as.factor(tiene_ventas_electronicas),
+    rotacion_inventarios = as.factor(rotacion_inventarios),
+    rotacion_cxc = as.factor(rotacion_cxc),
+    rotacion_cxp = as.factor(rotacion_cxp),
+    ciclo_negocio = as.factor(ciclo_negocio),
+    ciclo_financiero = as.factor(ciclo_financiero),
+    grupo = as.factor(grupo)
+  )%>%
+  mutate(
+    grupo = fct_recode(grupo, "Grupo 1" = "1", "Grupo 2" = "2", "Grupo 3" = "3", "Grupo 4" = "4")
+  )
+
+
+```
+
+
+
+
+```{r}
+# Graficas de variables categoricas por grupo
+columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
+                          "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
+                          "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
+
+for (columna in columnasParaGraficar)
+{
+  p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
+    scale_y_continuous(labels=scales::percent)  +
+    ylab("Porcentaje")  
+  plot(p1)
+}
+```
+
+
+# Segmentacion K-means
+
+```{r}
+datos = read.csv("SegmentacionPCA.csv", sep=";")
+```
+
+
+
+```{r}
+# Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
+datosConFactores <-  datos %>%
+  mutate(
+    impo_cv = as.factor(impo_cv),
+    expo_vt = as.factor(expo_vt),
+    cxp = as.factor(cxp),
+    cxc = as.factor(cxc),
+    totalinventory = as.factor(totalinventory),
+    tiene_ventas_fisicas = as.factor(tiene_ventas_fisicas),
+    tiene_ventas_electronicas = as.factor(tiene_ventas_electronicas),
+    rotacion_inventarios = as.factor(rotacion_inventarios),
+    rotacion_cxc = as.factor(rotacion_cxc),
+    rotacion_cxp = as.factor(rotacion_cxp),
+    ciclo_negocio = as.factor(ciclo_negocio),
+    ciclo_financiero = as.factor(ciclo_financiero),
+    grupo = as.factor(grupo)
+  )%>%
+  mutate(
+    grupo = fct_recode(grupo, "Grupo 1" = "1", "Grupo 2" = "2", "Grupo 3" = "3", "Grupo 4" = "4", "Grupo 5" = "5")
+  )
+
+
+```
+
+
+
+```{r}
+# Graficas de variables categoricas por grupo
+columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
+                          "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
+                          "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
+
+for (columna in columnasParaGraficar)
+{
+  p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
+    scale_y_continuous(labels=scales::percent)  +
+    ylab("Porcentaje")  
+  plot(p1)
+}
+```
+
+

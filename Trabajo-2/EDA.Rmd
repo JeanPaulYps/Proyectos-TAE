@@ -69,12 +69,7 @@ tablaResumenTicketPromedioDeEntrada
 ```
 
 
-```{r, fig.width=12}
-totalPorCategoria <- obtenerTotalPorCategoria(valorPromedioTicketEntrada)
-totalPorCategoriaPorMilesDeMillones <- totalPorCategoria/1000000000
-barplot(totalPorCategoriaPorMilesDeMillones, ylim=c(0,12000),
-        xlab="Canal", ylab="Dinero total (en miles de millones de pesos)", main="Valor en pesos de ticket promedio de entrada") 
-```
+
 
 
 ```{r}
@@ -105,36 +100,14 @@ tablaResumenTicketPromedioDeEntrada
 
 
 
-```{r, fig.width=13}
-totalDeTransaccionesPorCanal <- obtenerTotalPorCategoria(transaccionesPromedioPorCanal)
-totalDeTransaccionesPorCanalEnMillonesDePesos <- totalDeTransaccionesPorCanal/1000000
-barplot(totalDeTransaccionesPorCanalEnMillonesDePesos, ylim=c(0,6),
-        xlab="Canal", ylab="Dinero total (en millones de pesos)", 
-        main="Valor de las transacciones mensuales en promedio por canal") 
-```
+
 
 ```{r}
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal), caption="Porcentaje de transacciones por canal", col.names="Porcentaje por canal")
 ```
 
 
-```{r}
-# Imprime el porcentaje de transacciones hechas por las primeras 50 personas
-clientesConTransaccionesDeEntradaMasValiosos <- datos[grep("nit|en_tx.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_tx")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100 ) %>% head(n=50) 
-sum(clientesConTransaccionesDeEntradaMasValiosos$totalPorcentaje)
-clientesConTransaccionesDeEntradaMasValiosos
-```
 
-```{r}
-# Prueba para analizar otros aspectos de los mejores clientes 
-mejoresTransacciones <- inner_join(datos, clientesConTransaccionesDeEntradaMasValiosos, by=c("nit" = "nit"))
-mejoresTransacciones
-```
-
-```{r}
-# Prueba para analizar el ciclo financiero de los mejores clientes del ticket de entrada 
-table(mejoresTransacciones$ciclo_financiero)
-```
 # Valor del ticket promedio de salida
 
 ```{r}
@@ -151,13 +124,7 @@ tablaResumenTransaccionesDeSalida
 ```
 
 
-```{r}
-totalTransaccionesDeSalida <- obtenerTotalPorCategoria(valorTicketPromedioSalida)
-totalTransaccionesDeSalidaPorMilesDeMillones <- totalTransaccionesDeSalida/1000000000
-barplot(totalTransaccionesDeSalidaPorMilesDeMillones, ylim=c(0,12000),
-        xlab="Canal", ylab="Dinero total (en miles de millones de pesos)", 
-        main="Valor promedio de las transacciones anuales de salida por canal") 
-```
+
 
 
 
@@ -165,11 +132,6 @@ barplot(totalTransaccionesDeSalidaPorMilesDeMillones, ylim=c(0,12000),
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
 ```
 
-```{r}
-clientesConTransaccionesDeEntradaMasValiosos <- datos[grep("nit|sal_vm.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("sal_vm")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100 ) %>% head(n=300) 
-sum(clientesConTransaccionesDeEntradaMasValiosos$totalPorcentaje)
-clientesConTransaccionesDeEntradaMasValiosos
-```
 
 
 
@@ -188,11 +150,7 @@ transaccionesPromedioDeSalida
 verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Transacciones promedio de salida", "Dinero total de salida")
 ```
 
-```{r}
-transaccionesDeSalidaTotal <-  obtenerTotalPorCategoria(transaccionesPromedioDeSalida)
-barplot(transaccionesDeSalidaTotal, xlab="Canal", ylab="Dinero total (en miles de millones de pesos)", ylim = c(0, 2000000),
-        main="Valor promedio de las transacciones mensuales de salida por canal")
-```
+
 
 
 ```{r}
@@ -203,11 +161,7 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida
 
 
 
-```{r}
-clientesConTransaccionesDeEntradaMasValiosos <- datos[grep("nit|sal_tx.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("sal_tx")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100 ) %>% head(n=300) 
-sum(clientesConTransaccionesDeEntradaMasValiosos$totalPorcentaje)
-clientesConTransaccionesDeEntradaMasValiosos
-```
+
 
 
 # Comparación de trafico por cada canal
