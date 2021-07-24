@@ -1,0 +1,183 @@
+---
+title: "Analisis segmentacion jerarquica"
+output: html_notebook
+---
+
+
+
+# Analisis por canales
+
+```{r, warning=F, echo=F, include=F}
+library(tidyverse)
+datos = read.csv("SegmentacionPCA.csv", sep=";")
+datos = datos[,-1]
+```
+
+```{r}
+
+# Obtener el total por grupo y canal
+totalPorGrupos <- datos %>% group_by(grupo) %>% 
+                  summarise(across(everything(), sum))
+totalPorGrupos
+```
+
+
+```{r}
+grupo <- c(1,2,3,4,5)
+
+#Funcion que cambia el nombre a las columnas que cumplan con el REGEX
+renombrarColumnas <- function(dataFrame, regexColumnas, nombresNuevos)
+{
+  return (dataFrame[grep(regexColumnas, names(dataFrame))] %>% 
+                               setNames(nombresNuevos))
+}
+
+# Calcula el porcentaje en un DataFrame numerico
+calcularPorcentajes <- function(dataFrame)
+{
+  return (dataFrame/ sum(dataFrame) * 100)
+}
+
+# Une la columna de grupos al DataFrame
+agregarColumnaDeGrupos <- function(dataFrame)
+{
+  Grupo <- c("Grupo 1", "Grupo 2", "Grupo 3", "Grupo 4", "Grupo 5")
+  return(cbind(Grupo, dataFrame))
+}
+
+# Esto era para un experimento. Agrega el tipo de ticket a un DataFrame 
+agregarColumnaDeTipoTicket <- function(dataFrame, tipoDeTicket)
+{
+  return(cbind(dataFrame, tipoDeTicket))
+}
+
+
+# Los nuevos nombres de los canales 
+nombresDeCanalesDeEntrada = c("Canal 1", "Canal 2", 
+                           "Canal 3", "Canal 4",
+                           "Canal 5", "Canal 6",     
+                           "Canal 7", "Canal 8",
+                           "Canal 9", "Canal 10",
+                           "Otros canales")
+
+nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
+
+# Pone nombres mas legibles a los canales y calcula los porcentajes que genera cada grupo
+
+# Modifica los tickets de entrada
+
+regexTiquetDeEntrada = "en_vm.*"
+
+TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos()
+
+# Modifica las transacciones de entrada
+
+regexTransaccionesDeEntrada = "en_tx.*"
+
+transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTransaccionesDeEntrada, nombresDeCanalesDeEntrada) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+
+
+
+# Modfica los tiquets de salida
+
+regexTiquetDeSalida ="sal_vm.*"
+
+ticketsDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+
+# Modifica las transacciones de salida
+regexTiquetDeSalida ="sal_tx.*"
+transaccionesDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
+                                calcularPorcentajes() %>%
+                                agregarColumnaDeGrupos() 
+```
+```{r}
+# DataFrame resultante del proceso anterior
+TiquetsDeEntradaEnPorcentajes
+```
+```{r}
+
+graficarPorcentajesDeClientesEnCanales <- function  (dataFrame, tipoDeTiquet)
+{
+  grafica <- ggplot(data=reshape2::melt(dataFrame, id.vars ="Grupo"), aes(x=variable, y=value, fill=Grupo)) + 
+            geom_bar(width = 0.7, stat="identity", position="stack") +
+            labs(title= paste("Porcentaje de ventas", tipoDeTiquet,  "por cada grupo en cada canal"),
+                 x="Canales", y="Porcentaje de clientes") + 
+            theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+  return(grafica)
+}
+
+plot(graficarPorcentajesDeClientesEnCanales(TiquetsDeEntradaEnPorcentajes, "de ticket de entrada"))
+
+```
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeEntradaEnPorcentajes, "de transacciones de entrada"))
+```
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(ticketsDeSalidaEnPorcentajes, "de tickets de salida"))
+```
+
+
+```{r}
+plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeSalidaEnPorcentajes, "de transacciones de salida"))
+transaccionesDeSalidaEnPorcentajes
+```
+```{r}
+datos %>% group_by(as.factor(grupo)) %>%  count(as.factor(impo_cv))
+```
+
+
+
+
+
+```{r}
+# Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
+datosConFactores <-  datos %>%
+  mutate(
+    impo_cv = as.factor(impo_cv),
+    expo_vt = as.factor(expo_vt),
+    cxp = as.factor(cxp),
+    cxc = as.factor(cxc),
+    totalinventory = as.factor(totalinventory),
+    tiene_ventas_fisicas = as.factor(tiene_ventas_fisicas),
+    tiene_ventas_electronicas = as.factor(tiene_ventas_electronicas),
+    rotacion_inventarios = as.factor(rotacion_inventarios),
+    rotacion_cxc = as.factor(rotacion_cxc),
+    rotacion_cxp = as.factor(rotacion_cxp),
+    ciclo_negocio = as.factor(ciclo_negocio),
+    ciclo_financiero = as.factor(ciclo_financiero),
+    grupo = as.factor(grupo)
+  )%>%
+  mutate(
+    grupo = fct_recode(grupo, "Grupo 1" = "1", "Grupo 2" = "2", "Grupo 3" = "3", "Grupo 4" = "4")
+  )
+
+
+```
+
+
+
+
+```{r}
+# Graficas de variables categoricas por grupo
+columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
+                          "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
+                          "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
+
+for (columna in columnasParaGraficar)
+{
+  p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), position="dodge") + 
+    scale_y_continuous(labels=scales::percent)  +
+    ylab("Porcentaje")  
+  plot(p1)
+}
+```
+
