@@ -14,6 +14,7 @@ datos = datos[!duplicated(datos$nit),]
 ```
 
 ```{r}
+# Funcion para crear una nueva columna con el porcentaje de las transacciones que ese cliente genera 
 calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreColumnaPorcentajes)
 {
   dataFrameConTotalYPorcentajes <- df %>% mutate(
@@ -31,6 +32,7 @@ calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreC
 
 
 ```{r}
+# Calcular los porcentajes para cada tipo de ticket
 datosConPorcentajesYTotales <-  datos %>% 
   calcularTotalPorFilas("en_vm", "total_tickets_de_entrada_cliente", "porcentaje_de_tickets_de_entrada_cliente") %>%
   calcularTotalPorFilas("en_tx", "total_transacciones_de_entrada_cliente", "porcentaje_transacciones_de_entrada_cliente") %>%
@@ -41,6 +43,7 @@ datosConPorcentajesYTotales <-  datos %>%
 # Analisis de los clientes con mas tickets de entrada 
 
 ```{r}
+# Genera un dataFrame donde compara el top 80% con el resto 
 resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
 {
     resumenDeMayoria <- dfMayoria %>%
@@ -59,6 +62,7 @@ resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
 
 
 ```{r}
+# Se sacan los 300 mejores clientes que es la cantidad que genera el 80% de las transacciones
 clientesQueGeneranLaMayoriaTicketsEntrada <- datosConPorcentajesYTotales %>%
                                filter(total_tickets_de_entrada_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_entrada_cliente)) %>%
@@ -75,6 +79,7 @@ clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+
 ImpoCVMayoria <- clientesQueGeneranLaMayoriaTicketsEntrada %>%
   count(impo_cv, sort = TRUE) %>%
   mutate(n = n/sum(n) * 100)
@@ -87,8 +92,7 @@ ImpoCVMinoria <- clientesQueGeneranMenorTicketsEntrada %>%
 
 
 ```{r}
-
-
+# Grafica los datos de una columna seleccionada
 graficar_datos <- function (df, columnaDf, nombreMasLegible)
 {
   titulo <- sprintf("Porcentaje de %s para cada subgrupo", nombreMasLegible)
@@ -108,6 +112,7 @@ graficar_datos <- function (df, columnaDf, nombreMasLegible)
 
 
 ```{r}
+# Se escogen nombres que sean mas entendibles para el que lee el reporte
 nombresLegibles <- c("Importaciones categorizadas", "Exportaciones categorizadas",
                      "Cuentas por pagar", "Cuentas por cobrar",
                      "Valor de inventarios", "Ventas fisicas", 
@@ -126,6 +131,7 @@ names(nombresLegibles) <- c("impo_cv", "expo_vt",
 
 
 ```{r fig.ncol=2, fig.align='center', out.height='25%'}
+# Se compara el comportamiento de los clientes que generan el 80% con el resto
 
 for (columna in names(nombresLegibles))
 {
@@ -140,6 +146,7 @@ for (columna in names(nombresLegibles))
 # Analisis clientes con mas transacciones de entrada mensuales 
 
 ```{r}
+# Los mejores 80 clientes generan el 80% de las transacciones 
 clientesConMasTransaccionesEntrada <- datosConPorcentajesYTotales %>%
                                filter(total_transacciones_de_entrada_cliente != 0)  %>%  
                                arrange(desc(total_transacciones_de_entrada_cliente)) %>%
@@ -152,6 +159,7 @@ clintesConMenosTransaccionesEntrada <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+# Se grafica las variables categoricas comparadas en ambos grupos
 for (columna in names(nombresLegibles))
 {
   datosColumna <- resumenVariableCategoricaComparada(clientesConMasTransaccionesEntrada, 
@@ -164,6 +172,7 @@ for (columna in names(nombresLegibles))
 # Analisis clientes con mas tickets de salida
 
 ```{r}
+# Con 500 clientes se genera el 80% de tickets de salida
 clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
                                filter(total_tickets_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_salida_cliente)) %>%
@@ -177,6 +186,7 @@ clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+# Compara las variables categoricas
 for (columna in names(nombresLegibles))
 {
   datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
@@ -190,6 +200,7 @@ for (columna in names(nombresLegibles))
 # Clientes con mas transacciones mensuales de salida 
 
 ```{r}
+# Los mejores 400 clientes generan el 80% de las transacciones
 clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
                                filter(total_transacciones_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_transacciones_de_salida_cliente)) %>%
@@ -203,6 +214,7 @@ clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+# Grafica las variables categoricas comparadas en los dos subgrupos 
 for (columna in names(nombresLegibles))
 {
   datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
