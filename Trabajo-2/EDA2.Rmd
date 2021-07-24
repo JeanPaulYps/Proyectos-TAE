@@ -100,7 +100,7 @@ graficar_datos <- function (df, columnaDf, nombreMasLegible)
   etiquetaMinoria <- sprintf("%s minoria", nombreMasLegible)
   datos <- reshape2::melt(df, id.vars=columnaDf)
   grafico <- ggplot(data=datos, aes(x=.data[[columnaDf]], y=value, fill=variable)) +
-          geom_bar(stat="identity", position=position_dodge()) + 
+          geom_bar(stat="identity", position="stack") + 
           scale_fill_discrete(name = nombreMasLegible, labels = c(etiquetaMayoria, etiquetaMinoria)) +
           labs(title=titulo, x=nombreMasLegible, y="Porcentaje") + 
           theme(legend.position = "top")

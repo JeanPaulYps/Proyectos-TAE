@@ -156,12 +156,11 @@ datosConFactores <-  datos %>%
     grupo = as.factor(grupo)
   )%>%
   mutate(
-    grupo = fct_recode(grupo, "Grupo 1" = "1", "Grupo 2" = "2", "Grupo 3" = "3", "Grupo 4" = "4")
+    grupo = fct_recode(grupo, "Grupo 1" = "1", "Grupo 2" = "2", "Grupo 3" = "3", "Grupo 4" = "4", "Grupo 5" = "5")
   )
 
 
 ```
-
 
 
 
@@ -174,7 +173,7 @@ columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", 
 for (columna in columnasParaGraficar)
 {
   p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
-    geom_bar(aes(y = (..count..)/sum(..count..)), position="dodge") + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
     scale_y_continuous(labels=scales::percent)  +
     ylab("Porcentaje")  
   plot(p1)

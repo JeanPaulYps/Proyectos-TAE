@@ -172,7 +172,7 @@ columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", 
 for (columna in columnasParaGraficar)
 {
   p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
-    geom_bar(aes(y = (..count..)/sum(..count..)), position="dodge") + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
     scale_y_continuous(labels=scales::percent)  +
     ylab("Porcentaje")  
   plot(p1)
