@@ -13,6 +13,7 @@ datos = read.csv("SegmentacionJerarquica.csv", sep=";")
 ```
 
 ```{r}
+# Obtener el total por grupo y canal
 totalPorGrupos <- datos %>% group_by(grupo) %>% 
                   summarise(across(everything(), sum))
 totalPorGrupos
@@ -21,57 +22,80 @@ totalPorGrupos
 
 ```{r}
 grupo <- c(1,2,3,4)
+
+#Funcion que cambia el nombre a las columnas que cumplan con el REGEX
 renombrarColumnas <- function(dataFrame, regexColumnas, nombresNuevos)
 {
   return (dataFrame[grep(regexColumnas, names(dataFrame))] %>% 
                                setNames(nombresNuevos))
 }
 
+# Calcula el porcentaje en un DataFrame numerico
 calcularPorcentajes <- function(dataFrame)
 {
   return (dataFrame/ sum(dataFrame) * 100)
 }
 
+# Une la columna de grupos al DataFrame
 agregarColumnaDeGrupos <- function(dataFrame)
 {
   Grupo <- c("Grupo 1", "Grupo 2", "Grupo 3", "Grupo 4")
   return(cbind(Grupo, dataFrame))
 }
 
+# Esto era para un experimento. Agrega el tipo de ticket a un DataFrame 
 agregarColumnaDeTipoTicket <- function(dataFrame, tipoDeTicket)
 {
   return(cbind(dataFrame, tipoDeTicket))
 }
 
-regexTiquetDeEntrada = "en_vm.*"
+
+# Los nuevos nombres de los canales 
 nombresDeCanalesDeEntrada = c("Canal 1", "Canal 2", 
                            "Canal 3", "Canal 4",
                            "Canal 5", "Canal 6",     
                            "Canal 7", "Canal 8",
                            "Canal 9", "Canal 10",
                            "Otros canales")
+
+nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
+
+# Pone nombres mas legibles a los canales y calcula los porcentajes que genera cada grupo
+
+# Modifica los tickets de entrada
+
+regexTiquetDeEntrada = "en_vm.*"
+
 TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeEntrada, nombresDeCanalesDeEntrada) %>%
                                 calcularPorcentajes() %>%
                                 agregarColumnaDeGrupos()
 
+# Modifica las transacciones de entrada
+
 regexTransaccionesDeEntrada = "en_tx.*"
+
 transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTransaccionesDeEntrada, nombresDeCanalesDeEntrada) %>%
                                 calcularPorcentajes() %>%
                                 agregarColumnaDeGrupos() 
 
 
+
+# Modfica los tiquets de salida
+
 regexTiquetDeSalida ="sal_vm.*"
-nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
+
 ticketsDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
                                 calcularPorcentajes() %>%
                                 agregarColumnaDeGrupos() 
 
+# Modifica las transacciones de salida
 regexTiquetDeSalida ="sal_tx.*"
 transaccionesDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
                                 calcularPorcentajes() %>%
                                 agregarColumnaDeGrupos() 
 ```
 ```{r}
+# DataFrame resultante del proceso anterior
 TiquetsDeEntradaEnPorcentajes
 ```
 ```{r}
@@ -106,17 +130,13 @@ transaccionesDeSalidaEnPorcentajes
 ```{r}
 datos %>% group_by(as.factor(grupo)) %>%  count(as.factor(impo_cv))
 ```
-```{r}
-test
-```
 
 
-```{r}
-ggplot(test, aes(x=impo_cv, y=count, fill=grupo))+
-  geom_bar(stat="identity", position="dodge")
-```
+
+
 
 ```{r}
+# Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
 datosConFactores <-  datos %>%
   mutate(
     impo_cv = as.factor(impo_cv),
@@ -138,28 +158,17 @@ datosConFactores <-  datos %>%
   )
 
 
+```
+
+
+
+
+```{r}
+# Graficas de variables categoricas por grupo
 columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
                           "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
                           "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
-```
 
-
-
-```{r}
-ggplot(datos, aes(x=as.factor(impo_cv), fill=as.factor(grupo))) + 
-    geom_bar(aes(y = (..count..)/sum(..count..)), position="dodge") + 
-    scale_y_continuous(labels=scales::percent)  +
-    ylab("relative frequencies")  
-```
-
-```{r}
-ggplot(datosConFactores, aes(x=impo_cv, fill=grupo)) + 
-    geom_bar(aes(y = (..count..)/sum(..count..)), position="dodge") + 
-    scale_y_continuous(labels=scales::percent)  +
-    ylab("Porcentaje")  
-```
-
-```{r}
 for (columna in columnasParaGraficar)
 {
   p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
