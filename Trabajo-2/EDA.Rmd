@@ -119,17 +119,20 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal
 
 
 ```{r}
+# Imprime el porcentaje de transacciones hechas por las primeras 50 personas
 clientesConTransaccionesDeEntradaMasValiosos <- datos[grep("nit|en_tx.*", names(datos))]  %>%  mutate(total = rowSums(select(.,contains("en_tx")))) %>% arrange(desc(total)) %>% mutate(totalPorcentaje= total/sum(total)*100 ) %>% head(n=50) 
 sum(clientesConTransaccionesDeEntradaMasValiosos$totalPorcentaje)
 clientesConTransaccionesDeEntradaMasValiosos
 ```
 
 ```{r}
+# Prueba para analizar otros aspectos de los mejores clientes 
 mejoresTransacciones <- inner_join(datos, clientesConTransaccionesDeEntradaMasValiosos, by=c("nit" = "nit"))
 mejoresTransacciones
 ```
 
 ```{r}
+# Prueba para analizar el ciclo financiero de los mejores clientes del ticket de entrada 
 table(mejoresTransacciones$ciclo_financiero)
 ```
 # Valor del ticket promedio de salida
@@ -212,6 +215,7 @@ clientesConTransaccionesDeEntradaMasValiosos
 
 
 ```{r}
+# Obtener los porcentajes por cada tipo de ticket
 porcentajePorTicketDeEntrada <- obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada)
 porcentajePorTransaccionesPromedioEntrada <- obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal)
 porcentajePorTicketDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida)
@@ -219,6 +223,7 @@ porcentajePromedioDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(transaccione
 ```
 
 ```{r}
+# Ajustar los nombres de los tickets de salida
 porcentajePorTicketDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
                                            porcentajePorTicketDeSalida=porcentajePorTicketDeSalida)
 porcentajePromedioDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
@@ -226,6 +231,7 @@ porcentajePromedioDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal
 ```
 
 ```{r}
+# Ajustar los nombres de los tickets de entrada
 infoCanalesPorcentajes <- data.frame(canal = c("Canal 1","Canal 2",
                             "Canal 3","Canal 4",
                             "Canal 5","Canal 6",
@@ -237,6 +243,7 @@ infoCanalesPorcentajes$porcentajePorTransaccionesPromedioEntrada = porcentajePor
 ```
 
 ```{r}
+#Unir todos los porcentajes en un solo dataFrame
 infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") 
 infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePromedioDeSalida, by="canal") 
 infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything(), .fns = ~replace_na(.,0))) 
@@ -244,6 +251,7 @@ infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything()
 
 
 ```{r}
+# Prueba para hacer ajustes de formato
 left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") %>% mutate_all(funs(replace_na(.,0)))
 ```
 
@@ -251,6 +259,7 @@ left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") %>% m
 
 
 ```{r}
+# Grafica de porcentaje de transacciones por categoria
 ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=canal, y=value, fill=variable)) +
   geom_bar(width = 0.7, stat="identity", position=position_dodge()) + 
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
