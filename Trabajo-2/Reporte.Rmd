@@ -64,6 +64,7 @@ crearAnalisisDescriptivoDeTickets <- function ()
 
 
 ```{r}
+# Arregla el nombre de las columnas para que se muestren con un mejor nombre en las tablas y graficos
 valorPromedioTicketEntrada <-  datos[grep("en_vm.*", names(datos))] %>% 
                                setNames(c("Canal 1",
                                           "Canal 2",
@@ -100,6 +101,7 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), 
 
 
 ```{r}
+# Arregla el nombre de las columnas para que se muestren con un mejor nombre en las tablas y graficos
 transaccionesPromedioPorCanal <-  datos[grep("en_tx.*", names(datos))] %>% 
                                setNames(c("Canal 1","Canal 2",
                                           "Canal 3","Canal 4",
@@ -127,10 +129,10 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal
 ### Valor del ticket promedio de salida
 
 ```{r}
+# Arregla el nombre de las columnas para que se muestren con un mejor nombre en las tablas y graficos
 valorTicketPromedioSalida <-  datos[grep("sal_vm.*", names(datos))] %>% 
                                setNames(c("Canal 5","Canal 2",
                                           "Canal 8","Otros canales"))
-valorTicketPromedioSalida
 ```
 
 
@@ -155,10 +157,10 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida), c
 
 
 ```{r}
+# Arregla el nombre de las columnas para que se muestren con un mejor nombre en las tablas y graficos
 transaccionesPromedioDeSalida <-  datos[grep("sal_tx.*", names(datos))] %>% 
                                setNames(c("Canal 5","Canal 2",
                                           "Canal 8","Otros canales"))
-transaccionesPromedioDeSalida
 ```
 
 
@@ -219,10 +221,9 @@ infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePromedioDe
 infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything(), .fns = ~replace_na(.,0))) 
 ```
 
-
 ```{r}
-# Prueba para hacer ajustes de formato
-left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") %>% mutate_all(funs(replace_na(.,0)))
+knitr::kable(infoCanalesPorcentajes, col.names = c("Canal", "Porcentaje por ticket de entrada", "Porcentaje por transacciones mensuales de entrada",
+                                                   "Porcentaje por ticket de salida", "Porcentaje por transacciones de salida"))
 ```
 
 
@@ -407,6 +408,7 @@ datos_numericos <- datos2[ , !(names(datos2) %in% datos_categoricos)]#Para hacer
 ```
 
 ```{r}
+# Descomposicion espectral
 Sigma_t<-cov(scale(datos_numericos,center=T,scale=T))
 descomp_espectr_t<-eigen(Sigma_t)
 lambdas_t<-descomp_espectr_t$values
@@ -426,8 +428,8 @@ prop_varianza*100
 
 
 ```{r}
+# Grafica de varianza acumulada 
 prop_varianza_acum <- cumsum(prop_varianza)
-prop_varianza_acum
 
 ggplot(data = data.frame(prop_varianza_acum, pc = 1:20),
        aes(x = pc, y = prop_varianza_acum, group = 1)) +
@@ -440,6 +442,7 @@ ggplot(data = data.frame(prop_varianza_acum, pc = 1:20),
 
 
 ```{r, warning=F, echo=F}
+# Visualizacion de datos con PCA 
 datos_proyectados = acprincipales$x
 
 grupo = read.csv("SegmentacionJerarquica.csv", sep=";")  %>% select(grupo)
@@ -572,10 +575,6 @@ plot(graficarPorcentajesDeClientesEnCanales(ticketsDeSalidaEnPorcentajes, "de ti
 
 ```{r}
 plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeSalidaEnPorcentajes, "de transacciones de salida"))
-transaccionesDeSalidaEnPorcentajes
-```
-```{r}
-datos %>% group_by(as.factor(grupo)) %>%  count(as.factor(impo_cv))
 ```
 
 
