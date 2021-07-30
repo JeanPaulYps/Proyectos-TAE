@@ -369,14 +369,31 @@ clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+
+listaDeVariablesCategoricas <- list()
 # Compara las variables categoricas
 for (columna in names(nombresLegibles))
 {
   datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
                                      clientesQueGeneranMenorTicketsSalida, columna)
   grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
-  print(grafico)
+  listaDeVariablesCategoricas <- c(listaDeVariablesCategoricas, list(grafico))
 }
+
+```
+
+```{r}
+# Acceder a la variable que necesitas con la variable listaDeVariablesCategoricas
+# con doble llaves cuadradadas [[]] y el indice que necesitas
+plot(listaDeVariablesCategoricas[[1]]#<- asi
+)
+```
+
+```{r}
+# Asi puedes hacer una cuadricula con variables un subconjunto de variables
+# Con la notacion de llaves cuadradas escoges donde empezar y terminar
+# [1,6] Elementos del 1 al 6 
+do.call(grid.arrange, c(listaDeVariablesCategoricas[1:6], nrow = 2))
 ```
 
 
