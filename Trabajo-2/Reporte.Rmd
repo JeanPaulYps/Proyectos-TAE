@@ -662,6 +662,16 @@ El grupo 3 tiene mayor participación en del: 6%, 3% y 1% en los canales 2, 1 y 
 respectivamente. El grupo 2 y el grupo 4 tienen menos del 3 % de participación total y 
 sus canales preferido es son el 1,2 y 3. 
 
+Algo que no se espera es que el canal 2 tiene pocas transacciones mensuales y aun 
+así su valor de ticket anual es alto, por lo que parece que son transacciones 
+de gran volumen en un periodo corto, tal vez son clientes que compran en una temporada
+específica del año y por eso su valor de transacciones mensual no es tan alto. 
+
+Otro caso interesante es el del canal 4 el cual mueve unas transacciones muy altas pero
+no tiene un porcentaje de ventas tan alto. Es decir en este canal se recoge dinero 
+frecuentemente pero no alcanzan una cuota de mercado tan alto como se espera. Esto
+mismo ocurre con los clientes que participan con el canal 3 y otros. 
+
 
 
 ```{r}
@@ -683,11 +693,11 @@ transaccionesDeEntradaEnPorcentajes
 
 La gran mayoría de los tickets de salida van al canal 2 y 5 con un 98% de los
 tickets totales. El canal 2 tiene el 70% de los tickets y el canal 5 tiene
-el 20% de los mismos. Solo en el grupo 1 con el canal 2 y 5 suman al rededor 
-de 12 billones de pesos. Y contando la contribución del grupo 3 estos suman
-2 billones de pesos. Es decir en las cuentas contenidas en estos canales son 
-tambien las que mas gasta dinero la compañía. Los demas canales no parecen ser 
-significantes pero seguramente son servicios necesarios. 
+el 20% de los mismos. Solo en el grupo 1 con los canales 2 y 5 suman al rededor 
+de 12 billones de pesos. Y contando la contribución del grupo 3 en estos suman
+2 billones de pesos. Para los grupos 2 y 4 tambien hay una preferencia por estos
+mismos canales así que hay que estudiar la necesidad de conservar los demas 
+canales.
 
 ```{r}
 ticketsDeSalidaEnPorcentajes
@@ -702,8 +712,62 @@ colSums(ticketsDeSalidaEnPorcentajes[,-1])
 ```{r}
 rowSums(ticketsDeSalidaEnPorcentajes[,-1])
 ```
+#### Valor de transacciones promedio mensual 
+
+Las transacciones promedio de salida tienen un gran valor en el canal 2 y el 5
+aca podemos ver la participación de los grupos, la cual es una tendencia que 
+se repite en todas las variables númericas, el grupo 1 ocupa la gran mayor parte 
+seguido por el grupo 3 a este le sigue el grupo 2 y el grupo 4 es el que peor 
+desempeño muestra en este tipo de medidas.
+
+En este caso vemos que solo el canal 2 se lleva el 98% de las transacciones mensuales, 
+aca vemos el comportamiento que se espera de los clientes con mayor transacción anual,
+un alto volumen de transacciones mensuales que se reflejan posteriormente en un valor
+de ticket mas grande. Aunque tambien podemos ver que existen varios casos como el del
+canal 5 que tiene una alta cuota del valor de los tickets pero con pocas transacciones 
+mensuales. 
+
+Analizando el comportamiento dentro del canal principal el grupo 1 en este caso 
+se lleva el 61% de las transacciones, el grupo 3 el 16%, el grupo 2 el 13% y el
+grupo 4 con el 7%. Valdría la pena analizar que tan necesarios son el canal 8 y 
+otros para la compañía ya que generan poco valor.     
+ 
+
+```{r}
+transaccionesDeSalidaEnPorcentajes
+```
+
+```{r}
+colSums(transaccionesDeSalidaEnPorcentajes[,-1])
+```
+
+
 
 ## Variables categoricas
+
+En esta clasificación tendremos información acerca del flujo de efectivo, es decir
+se veran variables que miden la capacidad de una empresa de generar efectivo. Esto 
+incluye la información desde que una materia prima es registrada para la venta hasta
+que se vende finalmente el producto final y el pago es recibido por la empresa.
+
+De la información que tenemos para evaluar la empresa, tendremos: 
+* Impo_cv: nos informa acerca de la frecuencia de la entrega de importaciones
+* Expo_vt: nos informa acerca de la frecuencia de la entrega de exportaciones
+* cxp: cuentas por pagar, compromisos de pago que la empresa ha adquirido
+* rotacion_cxp: rotación cuentas por pagar, indica la cantidad de veces que las 
+obligaciones de pago son cumplidas por la empresa
+* rotacion_cxc: rotación cuentas por cobrar, indica la cantidad de veces que la
+empresa recuada el total de una obligación de pago con otra compañía.
+* tiene_ventas_fisicas: 1 para indicar que si tiene ventas fisicas, 0 para 
+indicar si no tiene ventas físicas
+* tiene_ventas_electronicas: 1 para indicar que tiene ventas electronicas, 0 
+para inidicar que no tiene ventas electronicas 
+* ciclo_negocio: son los días en que una empresa recibe el pago del producto 
+una vez ha pagado al proveedor, pasando por la producción y distribución
+* ciclo_financiero: sono los días que una empresa lograr producir un producto, 
+una vez se compromete con el proovedor a adquirir el producto, pasando por la
+producción y distribución
+
 
 ```{r}
 # Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
@@ -735,9 +799,11 @@ datosConFactores <-  datos %>%
 
 ```{r}
 # Graficas de variables categoricas por grupo
-columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
-                          "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
-                          "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
+columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "rotacion_cxp",
+                          "cxc", "rotacion_cxc","totalinventory",
+                          "rotacion_inventarios", "tiene_ventas_fisicas",
+                          "tiene_ventas_electronicas", "ciclo_negocio",
+                          "ciclo_financiero")
 
 lista <- list()
 
