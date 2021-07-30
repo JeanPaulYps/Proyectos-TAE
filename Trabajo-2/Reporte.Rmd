@@ -458,19 +458,62 @@ plotly::plot_ly( x=~PC1, y=~PC2, z=~PC3, color=grupo$grupo )
 
 #  Analisis segmentacion jerarquica
 
+Para analizar apropiadamente a los clientes, tendremos que observar su comportamiento
+en dos categorias:
+
+* Las variables numericas, en esta categoria podremos encontrar:
+  * El valor promedio de entrada/salida del ticket por cada canal
+  * Cantidad de transacciones mensuales de entrada/salida por cada canal 
+  
+* Las variables categoricas, la estratificación de los estados financieros
+  * Informacion acerca de las importaciones
+  * Informacion acerca de las exportaciones
+  * Informacion de las cuentas por cobrar
+  * Informacion de las cuentas por pagar
+  * Informacion de los ciclos financieros
+  * Informacion de los ciclos de negocio
+
+Bajo esas categorias se le dara un identificar patrones compartidos por los
+diferentes grupos asignados por la segmentación jerarquica. En total el algoritmo 
+ha identificó 4 grupos, que se pueden interpretar como 2 sub-segmentos del top 80% 
+de clientes que mas dinero genera a la empresa y el 20% inferior. Los segmentos 
+identificados quedan de la siguiente manera:
+
+* Top 80%:
+  * Grupo 1: este grupo que mas ingresos genera
+  * Grupo 3: este segundo grupo que mas ingresos genera
+* El 20% inferior: 
+  * Grupo 4: este grupo de esta categoría que mas ingresos genera
+  * Grupo 2: este grupo es el que menos ingresos genera
+
+Debido a que el grupo 1 es el que mas ingresos genera y tambien el grupo con el 
+que mas se hacen transacciones de salida, este grupo va a predominar en esta 
+primera frente a los otros grupos. 
+
+
+
 ```{r, warning=F, echo=F, include=F}
-datos = read.csv("SegmentacionJerarquica.csv", sep=";") 
+datos = read.csv("SegmentacionJerarquica.csv", sep=";")
 ```
+
+
+## Total por grupo en cada canal
+
+En la siguiente tabla se puede ver el total de dinero generados por los tickets 
+por cada canal y grupo. Y a continuación, tambien se encontrarán varios graficos donde
+se mostrará el porcentaje de participación de los grupos en cada uno de los canales.
+
+
 
 ```{r}
 # Obtener el total por grupo y canal
 totalPorGrupos <- datos %>% group_by(grupo) %>% 
                   summarise(across(everything(), sum))
-totalPorGrupos
+totalPorGrupos[,1:31] / 10^9
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 grupo <- c(1,2,3,4)
 
 #Funcion que cambia el nombre a las columnas que cumplan con el REGEX
@@ -513,7 +556,6 @@ nombresDeCanalesDeSalida = c("Canal 5","Canal 2", "Canal 8","Otros canales")
 # Pone nombres mas legibles a los canales y calcula los porcentajes que genera cada grupo
 
 # Modifica los tickets de entrada
-
 regexTiquetDeEntrada = "en_vm.*"
 
 TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeEntrada, nombresDeCanalesDeEntrada) %>%
@@ -521,7 +563,6 @@ TiquetsDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeE
                                 agregarColumnaDeGrupos()
 
 # Modifica las transacciones de entrada
-
 regexTransaccionesDeEntrada = "en_tx.*"
 
 transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTransaccionesDeEntrada, nombresDeCanalesDeEntrada) %>%
@@ -531,7 +572,6 @@ transaccionesDeEntradaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTra
 
 
 # Modfica los tiquets de salida
-
 regexTiquetDeSalida ="sal_vm.*"
 
 ticketsDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiquetDeSalida, nombresDeCanalesDeSalida) %>%
@@ -544,11 +584,11 @@ transaccionesDeSalidaEnPorcentajes <-renombrarColumnas(totalPorGrupos, regexTiqu
                                 calcularPorcentajes() %>%
                                 agregarColumnaDeGrupos() 
 ```
-```{r}
-# DataFrame resultante del proceso anterior
-TiquetsDeEntradaEnPorcentajes
-```
-```{r}
+
+
+
+
+```{r, echo=FALSE}
 
 graficarPorcentajesDeClientesEnCanales <- function  (dataFrame, tipoDeTiquet)
 {
@@ -559,27 +599,111 @@ graficarPorcentajesDeClientesEnCanales <- function  (dataFrame, tipoDeTiquet)
             theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
   return(grafica)
 }
+```
 
-plot(graficarPorcentajesDeClientesEnCanales(TiquetsDeEntradaEnPorcentajes, "de ticket de entrada"))
 
+
+```{r, fig.width=15, fig.height=12}
+grid.arrange(graficarPorcentajesDeClientesEnCanales(TiquetsDeEntradaEnPorcentajes, "de ticket de entrada"),
+             graficarPorcentajesDeClientesEnCanales(transaccionesDeEntradaEnPorcentajes, "de transacciones de entrada"),
+             graficarPorcentajesDeClientesEnCanales(ticketsDeSalidaEnPorcentajes, "de tickets de salida"),
+             graficarPorcentajesDeClientesEnCanales(transaccionesDeSalidaEnPorcentajes, "de transacciones de salida"),
+             ncol = 2
+             )
+```
+
+
+
+### Tickets de entrada 
+
+#### Valor promedio del ticket anual
+
+Para esta categoría podemos ver los canales y los grupos que son mas relevantes.
+Podemos ver que el canal 1, 2, 5 y 7 son los canales mas importantes. Y que en 
+ellos se agrupa el mas de 90% del valor de todos los tickets. Sin duda es una 
+buena decisión seguir invirtiendo en estos canales. Como oportunidades de negocio
+se observa que el canal 3, 6 y otros canales generan al rededor del un 8%, que pueden
+ser una oportunidad para expandirse a futuro, el canal 6 parece ser un buen prospecto
+para los grupos con desempeño mas bajo, ya que si los sumamos logran alcanzar al 
+segundo mejor grupo. 
+
+El canal 2 es donde todos llegan a tener una mayor participación en el cual el 
+grupo 1 genera 8 billones de pesos, seguido por el 3 que genera 1.2 billones de pesos, 
+seguido por el grupo 2 con 753 mil millones de pesos y grupo 4 con 629 mil millones 
+de pesos.
+
+A parte del canal anterior donde mas destaca el grupo 1 son en el 5 con un 16.6% del total,
+el 1 con el 11.9% del total y el 4 con el 3.4% del total. 
+
+
+
+```{r}
+TiquetsDeEntradaEnPorcentajes
 ```
 
 ```{r}
-plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeEntradaEnPorcentajes, "de transacciones de entrada"))
+ colSums(TiquetsDeEntradaEnPorcentajes[,-1])
+```
+#### Transacciones promedio mensual 
+
+
+Los canales 4, 3, 1 y otros son los canales mas importantes para esta categoría.
+De nuevo como en el valor de los tickets anuales, hay una canal que predomina, 
+en este caso el canal 4 es el que mas transacciones genera agrupando mas del 
+50% de las transacciones mensuales. Y los canales 3, 1 y otros agrupan un 10-20% 
+de las transacciones cada uno. El único canal que mantiene una gran participación
+en ambas categorías es el canal 1 con mas del 10% de participación. Los demas canales
+manejan un volumen practicamente nulo. Una oportunidad que vale la pena explorar es
+como aumentar el volumen de transacciones mensuales para el canal 2. 
+
+Analizando mas a profundidad el grupo 1 vemos que su participación del total en 
+los diferentes canales son: 46%, 15% y 11% en los canales 4,3 y otros respectivamente.
+El grupo 3 tiene mayor participación en del: 6%, 3% y 1% en los canales 2, 1 y otros
+respectivamente. El grupo 2 y el grupo 4 tienen menos del 3 % de participación total y 
+sus canales preferido es son el 1,2 y 3. 
+
+
+
+```{r}
+transaccionesDeEntradaEnPorcentajes
 ```
 
 ```{r}
-plot(graficarPorcentajesDeClientesEnCanales(ticketsDeSalidaEnPorcentajes, "de tickets de salida"))
+ colSums(transaccionesDeEntradaEnPorcentajes[,-1])
 ```
 
 
 ```{r}
-plot(graficarPorcentajesDeClientesEnCanales(transaccionesDeSalidaEnPorcentajes, "de transacciones de salida"))
+ rowSums(transaccionesDeEntradaEnPorcentajes[,-1])
+```
+
+### Tickets de salida
+
+#### Valor promedio del ticket anual
+
+La gran mayoría de los tickets de salida van al canal 2 y 5 con un 98% de los
+tickets totales. El canal 2 tiene el 70% de los tickets y el canal 5 tiene
+el 20% de los mismos. Solo en el grupo 1 con el canal 2 y 5 suman al rededor 
+de 12 billones de pesos. Y contando la contribución del grupo 3 estos suman
+2 billones de pesos. Es decir en las cuentas contenidas en estos canales son 
+tambien las que mas gasta dinero la compañía. Los demas canales no parecen ser 
+significantes pero seguramente son servicios necesarios. 
+
+```{r}
+ticketsDeSalidaEnPorcentajes
+```
+
+```{r}
+colSums(ticketsDeSalidaEnPorcentajes[,-1])
 ```
 
 
 
+```{r}
+rowSums(ticketsDeSalidaEnPorcentajes[,-1])
+```
 
+## Variables categoricas
 
 ```{r}
 # Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
@@ -615,15 +739,50 @@ columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", 
                           "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
                           "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
 
+lista <- list()
+
 for (columna in columnasParaGraficar)
 {
   p1 <- ggplot(datosConFactores, aes(x=.data[[columna]], fill=grupo)) + 
     geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
     scale_y_continuous(labels=scales::percent)  +
     ylab("Porcentaje")  
-  plot(p1)
+  lista <- c(lista, list(p1))
+  #plot(p1)
 }
 ```
+
+
+```{r, fig.width=14, fig.height=12}
+do.call(grid.arrange, c(lista[1:6], nrow = 3))
+```
+```{r, fig.width=14, fig.height=12}
+do.call(grid.arrange, c(lista[7:12], nrow = 3))
+```
+
+
+
+
+```{r}
+DfConPagos_pj <- datosConFactores %>% select(grupo, pagos_pj)
+DfConPagos_pj <- reshape2::melt(DfConPagos_pj, id.vars="grupo")
+ggplot(DfConPagos_pj, aes(x=grupo, y=value, fill=grupo) ) + 
+  geom_boxplot() +
+  theme(legend.position = "none") + 
+  labs(title= "Porcentaje de pagos a personas juridicas por grupo", x="Grupo", y="Porcentaje de pagos a personas juridicas")
+```
+
+
+```{r}
+DfConPagos_pn <- datosConFactores %>% select(grupo, pagos_pn)
+DfConPagos_pn <- reshape2::melt(DfConPagos_pn, id.vars="grupo")
+ggplot(DfConPagos_pn, aes(x=grupo, y=value, fill=grupo) ) + 
+  geom_boxplot() +
+  theme(legend.position = "none") + 
+  labs(title= "Porcentaje de pagos a personas naturales por grupo", x="Grupo", y="Porcentaje de pagos a personas naturales")
+```
+
+
 
 
 # Segmentacion K-means
@@ -676,5 +835,21 @@ for (columna in columnasParaGraficar)
   plot(p1)
 }
 ```
+
+
+```{r}
+#Test 
+
+nit <- read.csv("base_trabajo_segmentacion.csv", sep=";")$nit
+segConIds <- cbind(nit, datos)
+
+anti_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")  %>% #drops all observations in df1 that match in df2.
+anti_join(segConIds[segConIds$grupo==3,], by="nit") 
+
+
+inner_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")
+inner_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==3,], by="nit")
+```
+
 
 
