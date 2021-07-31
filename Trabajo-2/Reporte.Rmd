@@ -768,6 +768,7 @@ incluye la información desde que una materia prima es registrada para la venta 
 que se vende finalmente el producto final y el pago es recibido por la empresa.
 
 De la información que tenemos para evaluar la empresa, tendremos: 
+
 * Impo_cv: nos informa acerca de la frecuencia de la entrega de importaciones
 * Expo_vt: nos informa acerca de la frecuencia de la entrega de exportaciones
 * cxp: cuentas por pagar, compromisos de pago que la empresa ha adquirido
@@ -785,6 +786,8 @@ una vez ha pagado al proveedor, pasando por la producción y distribución
 una vez se compromete con el proovedor a adquirir el producto, pasando por la
 producción y distribución
 
+Se realizará un analisis individual de cada una de las categorías, para explicar
+los hallazgos mas importantes. 
 
 ```{r}
 # Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
@@ -812,8 +815,6 @@ datosConFactores <-  datos %>%
 ```
 
 
-
-
 ```{r}
 # Graficas de variables categoricas por grupo
 columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "rotacion_cxp",
@@ -839,9 +840,141 @@ for (columna in columnasParaGraficar)
 ```{r, fig.width=14, fig.height=12}
 do.call(grid.arrange, c(lista[1:6], nrow = 3))
 ```
+
+### Impo CV
+
+En esta categoría vemos un predominio del grupo 1 en las importaciones especialemente
+en el nivel 2, donde alcanza su mayor proporción, eso significa que este tipo de 
+cliente suele importar una gran cantidad y con una frecuencia no tan alta. 
+Despues tienen gran presencia los grupos 2 y 3 que importan en buena cantidad y
+a medida que la cantidad de importaciones aumenta la cuota de estos grupos se
+reducen. En último lugar tenemos al grupo 4 que tienen dos subgrupos uno que
+importa mucho pero sin tanta frecuencia y otro que trae productos con mucha
+frecuencia pero en poca cantidad.
+
+### Expo vt
+
+En las exportaciones se ve que el grupo 1 alcanza una cuota muy amplia y se 
+concentra una parte de las exportaciones en la zona media, lo cual siginifica
+que suele exportar productos mas frecuentemente que los otros grupos. Los demas
+grupos tienen una frecuencia de exportacion que ocupa una proporción pareja
+entre los tres grupos frecuentes, lo que es común en estos grupos es que es que 
+su nivel de exportación se ubique en la zona media e inferior, eso indica que 
+estos grupos no suelen exportar de manera tan intensiva como el grupo 1. 
+
+
+### cxp 
+
+El grupo 1 tiene muchas cuentas por pagar de gran volumen, vemos que este grupo 
+se ubica en el último nivel con una proporción mucho mas grande que los demas, es 
+decir que los pedidos que hace a sus proovedores suele ser de un valor muy alto es
+raro ver en este grupo que tengan cuentas de valor muy bajo. En cambio los demas
+grupos no tienen unas cuentas por pagar como si lo tiene el primer grupo. Ellos 
+prefieren tener muchas cuentas por pagar por un valor muy bajo y sus cuentas por
+pagar se ubican debajo del nivel intermedio, con una proporción muy alta en el
+nivel 2. 
+
+### rotacion_cxp 
+
+Los  grupos muestran un comportamiento muy parecido en este apartado, 
+la tendencia es que a medida de que se las rotaciones de cuentas por pagar aumenta
+el número de empresas en esa categoría baja. Excepto en dos grupos particulares, el
+grupo 1 y 4 los cuales muestran una cantidad de empresas con rotaciones de cuentas 
+por pagar altas a comparación de los otros grupos. 
+
+### cxc
+
+El grupo 1 en este apartado muestra que tienen cuentas por cobrar con un valor 
+muy alto, la proporción para las cuentas por cobrar se ven mas grandes que las
+cuentas por pagar lo cual puede mostrar que aunque tengan muchas cuentas por pagar
+con un valor muy alto la cantidad de cuentas por cobrar parecen tener un valor 
+equivalente o superior al de las cuentas por pagar. Tal vez en las cuentas por 
+cobrar podemos evidenciar porque este grupo tiene un rendimiento en los tickets
+de entrada mas grande que los demas. Para los demas grupos tenemos un comportamiento
+similar: aumenta la proporción de las cuentas por cobrar hasta la zona media y despues
+de ahí cae en picada como se ve dramaticamente con el grupo 4, la mayoría suele tener
+mas cuentas por cobrar en el nivel 2 y 3 por lo que podemos decir que no tienen cuentas
+por cobrar tan grandes a comparación del grupo 1. 
+
+
+### Rotación_cxc
+
+En la rotación de cuentas por cobrar podemos ver un comportamiento similar al de las cuentas
+por pagar, el grupo 1 tiene proporciones similares para cada uno de los niveles. Los demas
+grupos a medida de que la cantidad de rotaciones aumenta la proporción de empresas se reduce
+pero en este caso el salto en cada nivel no reduce tan rapidamente la cantidad de empresas,
+si no que se reduce en saltos mas pequeños. Un caso especial es el del grupo 4 que mantiene
+un nivel parecido en todas las proporciones hasta el nivel 3 y en el último nivel aumenta, así
+que este grupo suele cobrar rápidamente sus cuentas y venden frecuentemente por los productos
+que ofrecen. 
+
+
+
+
 ```{r, fig.width=14, fig.height=12}
 do.call(grid.arrange, c(lista[7:12], nrow = 3))
 ```
+
+
+### totalInventory
+
+En este apartado, en el inventario total puede estar la clave para entender las
+características que hacen financieramente mas importante al grupo 1. En este grupo
+suelen estar las compañías con un valor de inventario muy alto se ve que la mayoría
+de estas empresas estan ubicadas en el nivel mas alto del inventario total, por lo 
+que son compañías con productos que tienen mucho valor. Para los demas grupos vemos
+que el valor de inventario suele estar por debajo la media y alcanza un maximo de su 
+valor en el nivel 2 y a partir de ese punto se reduce la cantidad de compañías a medida
+de que el inventario aumenta. Un caso diferente es el del grupo 4 que sigue la misma 
+tendencia de aumentar y despues reducirse, en particular aumenta hasta el nivel 3
+y de ahí se redcuce hasta el nivel 5 pero con un repunte en el ultimo nivel, este 
+grupo entonces es mas variado y tiene una cantidad de empresas con un valor de inventario 
+mas alto que los otros grupos pero en una proporicion de compañías mas bajas en cada nivel.
+
+### rotacion_inventarios
+
+El grupo 1 tiene una rotación de inventarios muy parecida en todos los niveles, 
+cabe resaltar que tiene una rotación muy alta en el último nivel, ya que los
+otros grupos a medida de que los niveles aumentan sus proporciones van bajando.
+Un grupo que no sigue esta tendencia es el grupo 4 que es un grupo cuya 
+rotación suel ser alta, su precencia empieza a crecer fuertemente desde el 
+nivel 4 y consigue una buena participación hasta el último nivel, así que
+estas compañías logran rotar rapidamente su inventario por lo que hay sospechas
+de que suelen vender frecuentemente muchos artículos de poco valor a diferencia
+del grupo 1 que no puede destacar en su rotación pero el valor de lo que tienen
+almacenado es muy grande. 
+
+### Ventas físicas y electrónicas
+
+Todos los grupos no venden electrónicamente, un grupo muy pequeño es el que tiene
+este tipo de ventas. Por las ventas físcas, el grupo 1 no suele destaca en cantidad 
+en este apartado, la mitad tiene ventas físicas y la otra mitad no tiene.
+Aca el grupo 2 y 3 destacan. El grupo 2 son compañías que no tiene ventas físicas, 
+ellos generan ingresos a partir de otros canales. El grupo 3 si tiene ventas físicas y 
+es ahí donde debe generar ingresos, en ventas de sus propias tiendas.
+
+### Ciclo de negocio 
+
+El primer grupo aumenta la proporción de su participación a partir de arriba del nivel 3
+y son compañías que tienen un ciclo de negocio alto, esto significa que toma muchos días 
+desde el momento que hacen el pago a un proveedor hasta que reciben el pago, así que sus 
+productos son productos que demoran en ser entregados. Para los grupos 2 y 3 vemos que
+se comportan de manera muy similar tienen una participación similar que aumenta hasta el nivel 4 y 
+apartir de ese punto empiezan a decrecer, esto significa que estos dos grupos demoran 
+un tiempo alrededor de la media de estas compañías en cerrar un negocio, son productos que
+se entregan mas rápido en comparación al grupo 1. El grupo 4 muestra un comportamiento 
+atípico casí todas las empresas se ubican en el maximo nivel, esto significa que 
+toma mucho tiempo en completar todo el ciclo de negocio y dado que sus productos no 
+son tan valiosos pueda ser que sean compañías que tengan algun cuello de botella en
+sus procesos internos. 
+
+### Ciclo financiero
+
+Aca los grupos muestran un comportamiento parecido ya que el ciclo financiero es el
+ciclo de negocio agregado con el tiempo desde que se ordena la materia prima. En 
+este apartado vemos que se reduce el nivel 4 un poco y aumenta el nivel 1, en este 
+ultimo nivel aumenta la participación del grupo 1, 2 y 3, así que algunas compañías 
+mejoran su rendimiento cuando se mide con el pedido de proveedores.
 
 
 
@@ -864,8 +997,56 @@ ggplot(DfConPagos_pn, aes(x=grupo, y=value, fill=grupo) ) +
   theme(legend.position = "none") + 
   labs(title= "Porcentaje de pagos a personas naturales por grupo", x="Grupo", y="Porcentaje de pagos a personas naturales")
 ```
+### Porcentaje de pagos a personas naturales y personas jurídicas
+
+El grupo 1 prefiere hacer negocios con personas naturales ya que tienen una media
+un poco por encima de las personas naturales. Para los demas grupos vemos una 
+preferencia mas marcada a hacer negocios con las personas jurídicas. 
 
 
+## Caracterización de grupos 
+
+* Grupo 1: estas son empresas que tienen un valor de inventario muy alto, suelen
+importar y exportar mucho mas que los demas, tienen cuentas por pagar y por cobrar
+muy grandes, con ciclos de negocios muy largos. El valor de los inventarios y el 
+volumen de las cuentas puede ser lo que explique porque esta empresa reciba tanto
+dinero de estas compañías y pague tanto dinero a las mismas.
+
+* Grupo 2: este grupo es muy similar al siguiente, son compañías que hacen 
+pocas importaciones al año, no tienen exportaciones particularmente grandes, 
+tienen muchas cuentas por pagar y cobrar de un valor por debajo de la media, 
+un inventario por debajo de la media, tienen un ciclo de negocio que esta 
+dentro de la media. Este grupo solo destaca en tener un modelo de negocio 
+donde no tiene ventas físicas. 
+
+* Grupo 3: tiene características similares que el grupo 2, la cantidad de importaciones,
+exportaciones, inventarios que estan por debajo de la media, tienen cuentas
+por pagar, cuentas por cobrar y ciclos de negocio que estan por la media. Este grupo
+a diferencia del anterior si tiene ventas físicas.
+
+* Grupo 4: estas empresas importan frecuentemente pero en una proporción baja, exportan
+a la misma frecuencia que la media. Tienen cuentas por pagar y por cobrar con valores
+por debajo de la media pero se hacen muchas cuentas al año, tienen inventarios por un
+valor bajo pero venden rapidamente este inventario, no muestra un tipo de venta favorito
+y demoran mucho en completar sus negocios. Estos son negocios que deben tener algún cuello
+de botella en la manera que hacen sus negocios.
+
+```{r}
+#Test 
+
+nit <- read.csv("base_trabajo_segmentacion.csv", sep=";")$nit
+segConIds <- cbind(nit, datos)
+
+anti_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")  %>% 
+anti_join(segConIds[segConIds$grupo==3,], by="nit") #drops all observations in df1 that match in df2
+
+
+inner_join(clientesQueGeneranLaMayoriaTicketsEntrada,segConIds[segConIds$grupo==1,], by="nit")
+inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==3,], by="nit")
+
+inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==2,], by="nit")
+inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==4,], by="nit")
+```
 
 
 # Segmentacion K-means
@@ -920,19 +1101,6 @@ for (columna in columnasParaGraficar)
 ```
 
 
-```{r}
-#Test 
-
-nit <- read.csv("base_trabajo_segmentacion.csv", sep=";")$nit
-segConIds <- cbind(nit, datos)
-
-anti_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")  %>% #drops all observations in df1 that match in df2.
-anti_join(segConIds[segConIds$grupo==3,], by="nit") 
-
-
-inner_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")
-inner_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==3,], by="nit")
-```
 
 
 
