@@ -6,35 +6,10 @@ output:
     toc: true
 ---
 
-# Introducción
-
-El presente trabajo se construye con base a la información suministrada por una base de datos simulada que contiene información de clientes corporativos de una empresa cuyos clientes son empresas.
-
-En dicho apartado se pueden encontrar dos tipos de variables, la primera de comportamiento de los clientes en canales y productos y la segunda de estados financieros de los clientes.
-
-El Clustering (Agrupamiento) es un proceso no supervisado en minería de datos y en el reconocimiento de Patrones, y se define "como una técnica para agrupar información en distintos grupos o clusters" así lo define el profesor de la Universidad Católica de Chile Karim Pichara Baksai, igualmente menciona algunos de los ejemplos más comunes en los que es aplicada esta técnica:
-
-- Segmentación de clientes.
-- Análisis en redes sociales.
-- Agrupación de documentos.
-
-El presente informe busca segmentar la base de datos mencionada anteriormente, de tal manera que le permita a "la empresa" conocer y buscar mejores alternativas que ofrecer a sus clientes a partir de técnicas de clustering como es el agrupamiento jerárquico o K-means.
-
-# Objetivo
-
-Proponer una segmentación que le permita a la empresa entender mejor a sus clientes, identificar patrones de uso de productos y canales y su relación con los estados financieros.
-
-# Problema
-
-Con la información contenida en la base de datos, se presenta el problema de determinar un agrupamiento efectivo de los clientes, que permita identificar un comportamiento en común entre los individuos de los diferentes grupos resultantes.
-
-# Materiales
-
-Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar asertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos. Para esto se usará el lenguaje de programación R y algunas librerías del lenguaje. 
-
-
-
 ```{r,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(gtable)
+library(ggpubr)
 library(tidyverse)
 library(gridExtra)
 library(cowplot)
@@ -83,7 +58,6 @@ crearAnalisisDescriptivoDeTickets <- function ()
 }
 
 ```
-
 A continuación se presenta un análisis exploratorio de los datos, que nos permite entender adecuadamente los datos, y dar pequeños indicios sobre las posibles tendencias y/o relaciones que se presentan entre las variables.
 
 Para empezar dicho análisis sobre las variables de las bases de datos, estas son divididas entre las variables de tipo númericas y de tipo categoricas. 
@@ -257,31 +231,85 @@ Se presenta un grafico de barras que resume la información de las variables de 
 ##  Variables categoricas
 
 
-A continuación, el análisis descriptivo y exploratorio de las variables de tipo categorica. 
+A continuación, se realiza el análisis descriptivo y exploratorio de las variables de tipo categórica. Estas variables, influyen en los estados financieros de una compañía en aspectos como las utilidades, cantidad de activos y/o pasivos a corto y largo plazo, y finalmente en el crecimiento del patrimonio. Es importante analizarlas ya que de acuerdo a su coportamiento se obtiene información que resulta valiosa para la toma de decisiones en la compañía.
 
-Para empezar, es importante describir cuales son los significados de estas variables las cuales representan el estado financiero de una compañía, y más exactamente algunas de ellas estan incluídas en el estado de flujo de efectivo de una empresa; este se define como un ciclo donde se incluyen actividades operativas, inversiones y financiamiento. Fuente: Science Direct. Las variables son las siguientes:
+En total se cuentan con 16 variables definidas de la siguiente manera: 
 
-* Impo_cv: [importaciones]/[compras] categorizadas. Informa acerca de la frecuencia de la entrega de importaciones.
-* Expo_vt: [exportaciones]/[ventas] categorizadas. Informa acerca de la frecuencia de la entrega de exportaciones.
-* cxp: [cuentas por pagar] categorizada con seis niveles.Compromisos de pago que la empresa ha adquirido.
-* cxc: [cuentas por cobrar] categorizada con seis niveles. Compromisos de los clientes (que tambien son empresas) han adquirido con la compañía.
-* tiene_ventas_fisicas: 1 para indicar que si tiene ventas fisicas, 0 para 
-indicar si no tiene ventas físicas.
-* tiene_ventas_electronicas: 1 para indicar que tiene ventas electronicas, 0 
-para inidicar que no tiene ventas electronicas. 
-* ciclo_negocio:[ciclo de negocio en días] categorizada con seis niveles. Son los días en que una empresa recibe el pago del producto una vez ha pagado al proveedor, pasando por la producción y distribución.
-* ciclo_financiero:[ciclo financiero en días] categorizada con seis niveles. Son los días que una empresa lograr producir un producto, una vez se compromete con el proovedor a adquirir el producto, pasando por la producción y distribución.
-*totalinventory: [valor de inventarios] categorizada con seis niveles. Representa el valor de los inventarios que son las propiedades muebles e inmuebles que posee la compañía.
-*rotacion_inventarios: [rotación de inventarios en días] categorizada con seis niveles. Son los días que la compañía demora en obtener nuevos inventarios para la distribución.
+* Importaciones de la empresa: 
 
-A continuación se presentan cuatro (4) variables que son de tipo númericas, pero que tambien describen en gran parte la parte financiera de la empresa en el estado de flujo de efectivo. 
+      Variable:    impo_cv: [importaciones]/[compras] categorizadas. 
+      Descripción: Clasifica de 1 a 5 las importaciones de una empresa de acuerdo al nivel de compras.
 
-*pagos_pj: [pagos hechos a personas jurídicas]/[pagos totales]. Porcentaje de pagos que se hacen a las personas u proveedores de naturaleza juridica en regimen tributario.
-*pagos_pn: [pagos hechos a personas naturales]/[pagos totales]. Porcentaje de pagos que se hacen a las personas u proveedores naturales en regimen tributario.
-* rotacion_cxp: [rotación de cuentas por cobrar en días] categorizada con seis niveles. Indica la cantidad de veces que las obligaciones de pago son cumplidas por la empresa.
-* rotacion_cxc:  [rotación de cuentas por pagar en días] categorizada con seis niveles. Indica la cantidad de veces que la empresa recuada el total de una obligación de pago con otra compañía.
+* Exportaciones de la empresa: 
 
-Para el siguiente análisis se muestra como se distribuye cada unas de las variables que compone esta parte del análisis, pero además es interesante hacer una comparación en cuanto a los tickets de salida, y por ello se propone comparar el top 80% que representa la mayoría de la información contra el 20% restante.
+      Variable:    expo_vt: [exportaciones]/[ventas] categorizadas. 
+      Descripción: Clasifica de 1 a 3 las exportaciones de una empresa de acuerdo al nivel de ventas.
+      
+* Cuentas por pagar: 
+
+      Variable:    cxp: [cuentas por pagar] categorizada con seis niveles.
+      Descripción: Clasifica a una empresa de 1 a 6 según el nivel de deuda adquirida con clientes en forma
+                   de cuenta por pagar.
+                   
+* Cuentas por cobrar: 
+
+      Variable:    cxc: [cuentas por cobrar] categorizada con seis niveles. 
+      Descripción: Clasifica a una empresa de 1 a 6 según el nivel de activos en deudas de clientes en forma
+                   de cuenta por cobrar.
+                   
+* Inventario total
+      Variable:    totalinventory: [valor de inventarios] categorizada con seis niveles.
+      Descripión:  Clasifica a una empresa de 1 a 6 de acuerdo con el valor de inventarios que posee (activos no corrientes).
+      
+* Ventas Físicas: 
+      Variable:    tiene_ventas_fisicas: 1 para indicar que sí tiene ventas fisicas, 0 para indicar si no tiene ventas físicas.
+      Descripción: Establece si la empresa cuenta o no con canales de venta físicos (Sí: 1, No: 0).
+
+* Ventas Electrónicas: 
+      Variable:    tiene_ventas_electronicas: 1 para indicar que tiene ventas electronicas, 0 para inidicar que no tiene ventas electronicas.
+      Descripción: Establece si la empresa cuenta o no con canales de venta electrónicos (Sí: 1, No: 0). 
+      
+* Rotación de inventarios:
+      Variable:    rotacion_inventarios: [rotación de inventarios en días] categorizada con seis niveles. 
+      Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo en que esta emplea en convertir el inventario en a dinero o a cuentas por                       cobrar.
+      
+* Rotación de cuentas por cobrar:
+      Variable:    rotacion_cxc:  [rotación de cuentas por cobrar en días] categorizada con seis niveles.
+      Descripción: Clasifica a una empresa de 1 a 4 de acuerdo a la cantidad de veces que la empresa recuada el total de una obligación de pago que                           adiquirida por un cliente.   
+
+* Rotación de cuentas por pagar:
+      Variable:    rotacion_cxp: [rotación de cuentas por pagar en días] categorizada con seis niveles. Descripción: Clasifica a una empresa de 1 a 4 de                     acuerdo a la cantidad de veces que las obligaciones                     de pago son cumplidas por la empresa.
+
+* ciclo_negocio:
+      Variable:    [ciclo de negocio en días] categorizada con seis niveles. 
+      Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo que emplea en producir un bien y/o servicio y en llegar al cliente.
+                   
+* ciclo_financiero:
+      Variable:    [ciclo financiero en días] categorizada con seis niveles. 
+      Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo que emplea para que la inversión realizada en la producción de bienes y/o                       servicios sea retornada en forma de dinero, es decir hasta que sea pagada por el consumidor.
+      
+A continuación, se presentan cuatro (4) variables que son de tipo númericas, pero que también son descritas dentro de las variables de caracter financiero en este trabajo. que describen en gran parte la parte financiera de la empresa en el estado de flujo de efectivo. 
+
+* Pagos personas jurídicas:
+      Variable:    pagos_pj: [pagos hechos a personas jurídicas]/[pagos totales]. 
+      Descripción: Porcentaje de pagos hechos a personas o empresas de en régimen tributario respecto a los
+                   pagos totales hechos por la empresa.
+      
+* Pagos personas naturales:
+      Variable:    pagos_pn: [pagos hechos a personas naturales]/[pagos totales]. 
+      Descripción: Porcentaje de pagos hechos a personas fuera del régimen tributario respecto a los pagos totales hechos por la empresa.
+
+* Recaudo personas jurídicas:
+      Variable:    recaudos_pj: [recaudos provenientes de personas jurídicas]/[recaudos totales].
+      Descripción: Porcentaje del recaudo total realizado a personas o empresas de en régimen tributario. 
+      
+* Recaudo personas naturales
+      Variable:    recaudos_pn: [recaudos provenientes de personas naturales]/[recaudos totales].
+      Descripción: Porcentaje del recaudo total realizado a personas fuera del régimen tributario.
+
+Para analizar los datos, entender mejor a los clientes y el comportamiento financiero de la empresa, se muestra la distribución de cada unas de las variables realizando una comparación con respecto a los tickets de salida. De acuerdo con esto, los resultados mostrados a continuación están discriminados por el top del 80% de las empresas (realizando varias compraraciones se llega a que este está conformado por un total de 500 empresas y/o personas jurídicas) que realizan la mayoría de transacciones de tickets de salida comparado con el 20% restante que conforman la minoría de contribuyentes. 
+
+A continuación se plantea el código que será utilziado para mostrar los datos de manera gráfica, discriminando por colores cada una de las franjas de clientes bien sea que pertenezcan al top 80% o al 20% restante (Rojo y naranja respectivamente).
 
 ```{r, warning=F, echo=F, include=F}
 
@@ -318,24 +346,34 @@ datosConPorcentajesYTotales <-  datos %>%
 
 ```{r}
 # Genera un dataFrame donde compara el top 80% con el resto 
-resumenVariableCategoricaComparada <- function( dfMayoria, dfMinoria, columna)
+resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
 {
-    total = datos %>% count(.dots=columna) %>% select(n) %>% sum()
     resumenDeMayoria <- dfMayoria %>%
       count(.dots=columna) %>%
-      mutate(n = n/total * 100)
+      mutate(n = n/sum(n) * 100)
     
     resumenDeMinoria <- dfMinoria %>%
       count(.dots=columna) %>%
-      mutate(n = n/total * 100)
-    
-   
+      mutate(n = n/sum(n) * 100)
     
     resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
     return(resumenComparativo)
 }
 ```
 
+
+
+```{r}
+# Se sacan los 300 mejores clientes que es la cantidad que genera el 80% de las transacciones
+clientesQueGeneranLaMayoriaTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               head(n=300)
+clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
+                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
+                               slice(301: n())
+```
 
 
 ```{r}
@@ -354,8 +392,8 @@ names(nombresLegibles) <- c("impo_cv", "expo_vt",
                             "rotacion_cxc", "rotacion_cxp", 
                             "ciclo_negocio", "ciclo_financiero"
                             )
+p3 <- qplot(names(nombresLegibles))
 ```
-
 
 ```{r}
 # Grafica los datos de una columna seleccionada
@@ -383,18 +421,14 @@ A continuación se genera de manera iterativa cada una de las gráficas correspo
 ```{r}
 # Con 500 clientes se genera el 80% de tickets de salida
 clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_salida_cliente)) %>%
                                head(n=500)
 
 clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
+                               filter(total_tickets_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_salida_cliente)) %>%
                                slice(501: n())
-```
-
-
-```{r}
-clientesQueGeneranLaMayoriaTicketsSalida
-clientesQueGeneranMenorTicketsSalida
 ```
 
 
@@ -537,20 +571,20 @@ for (columna in names(nombresLegibles))
 do.call(grid.arrange, c(listaDeVariablesCategoricas[1:12],nrow=4))
 ```
 
+
 ### Analisis de las posibles relaciones entre los tipos de variables
 
-A continuación se presenta una comparación directa  con las variables que representan el estado financiero de la compañía y los valores que se representan númericamente con los tickets y las transacciones. 
+A continuación se presenta una comparación directa con las variables que influyen en los estados financieros de la compañía y los valores que se representan númericamente con los tickets y las transacciones.
 
 ### Comparación con los porcentajes de tickets de Entrada por Cliente
 
 Mediante gráficos se propone buscar relaciones de cada variable de los estados financieros con el porcentaje de los tickets de entrada. 
 
 ```{r}
-# Graficas de relacion de las exportaciones, importaciones y cuentas por pagar o cobrar con los porcentajes de tickets de entrada
+# Graficas de relación de las exportaciones, importaciones y cuentas por pagar o cobrar con los porcentajes de tickets de entrada
 g1<-ggplot(data = datosConPorcentajesYTotales) + 
   geom_bin2d(aes(impo_cv,porcentaje_de_tickets_de_entrada_cliente)) + 
   labs(x = "Categorias de las importaciones sobre compras", y="Porcentaje de tickets de entrada")
-
 g2<-ggplot(data = datosConPorcentajesYTotales) + 
   geom_bin2d(aes(expo_vt,porcentaje_de_tickets_de_entrada_cliente)) + 
   labs(x = "Categorias de las exportaciones sobre ventas", y="Porcentaje de tickets de entrada")
@@ -566,7 +600,6 @@ g5<-ggplot(data = datosConPorcentajesYTotales) +
 g6<-ggplot(data = datosConPorcentajesYTotales) + 
   geom_bin2d(aes(rotacion_cxc,porcentaje_de_tickets_de_entrada_cliente))  + 
   labs(x = "Rotación de cuentas por pagar en días", y="Porcentaje de t6ckets de entrada")
-
 
 ```
 
@@ -857,7 +890,7 @@ f18<-ggplot(data = datosConPorcentajesYTotales)+
 grid.arrange(f11,f15,f12,f16,f13,f17,f14,f18, ncol=2)
 ```
 
-Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color rojo oscuro representan las variables de los puntos fisicos y las de color gris represantan las de los puntos de vnetas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de transacciones de entrada y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de transacciones de entrada, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
+Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color rojo oscuro representan las variables de los puntos fisicos y las de color gris represantan las de los puntos de ventas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de transacciones de entrada y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de transacciones de entrada, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
 
 ### Conclusiones del analisis exploratorio de los datos 
 
@@ -869,9 +902,19 @@ Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o
 
 *Las mejores categorias en todas las cuentas de cobrar o pagar son la categoria número 6, teniendo en cuenta que corresponde a categorias de ordianales, supone que a mayor número mejor para la compañía y esto lo apoya la frecuencia con los clientes y los diferentes porcentajes de transacciones y de tickets que se compararon. 
 
-*La rotación de las cuentas por pagar o por cobrar, tambien se asemejan a lo que se esperaba y es que en menor tiempo posible se cobre o se pague será mejor para la compañía.
+*La rotación de las cuentas por pagar o por cobrar, se asemejan a lo que se esperaba y es que en menor tiempo posible se cobre o se pague será mejor para la compañía.
 
-*Parece no existir diferencia significativa entre los puntos de ventas fisicos o electronicos; en donde si se encuentra diferencia y esto se concluye a partir de ciertas pruebas es el hecho de tener un punto de venta sin importar como sea.
+*Parece no existir diferencia significativa entre los puntos de ventas fisicos o electronicos, de acuerdo con cada una de las variables categóricas analizadas.
+
+*De las variables categóricas el grupo de empresas que pertenen al 80% que más contribuye en las trabsacciones por tickets de salida es el que mejor resultados ofrece y que mayor valor brinda a las finanzas de la empresa.
+
+*El valor total de inventarios de categoria 6 presenta el mayor número de empresas en comparación con las otras 5 categorías. En esta se concentran los clientes cuyo valor por inventarios es el mayor, es decir aquellas empresas de mayor tamaño según esta variable. 
+
+*Más de la mitad de las empresas en el 80% que más aporta por tickets de salida presenta valores mayores al 50% para el nivel de rotación de cuentas por pagar en las categorias 1 y 2. Esto sugiere que dichas empresas son buenos clientes dado que responden a saldar deuda adquirida con otras empresas dentro de plazos de tiempo cortos.
+
+*Tanto para las empresas en el 80% que más aporta como para el 20% de las empresas restantes de acuerdo a ticket de salida la implementación de canales electrónicos para ventas es poca (por no decir mínima). Esto sugiere que la empresa que atiende estos clientes debe de hacer uso intensivo de canales físicos para lograr brindar sus productos y/o servicios. Esta situación puede verse mejorada dado el progresivo avance en la digitalización de empresas (y por ende implementación de canales electrónicos) por parte de todas las industrias actualmente.
+
+*El comportamiento de las cuentas por pagar y el de el valor de inventarios es similar.Este patrón refleja el comportamiendo de cada empresa de acuerdo con el nivel de endeudamiento necesario para poder producir bienes y/o servicios. Esto puede indicar que se cuenta con clientes que tienen un balance financiero que es estable, es decir, que sus bienes corresponden a la cantidad adeudada más su patrimonio y que atienden a la deuda de acuerdo a un comportamiento normal de ventas por dichos bienes y/o servicios. 
 
 #  Segmentacion jerarquica
 
@@ -1558,22 +1601,6 @@ valor bajo pero venden rapidamente este inventario, no muestra un tipo de venta 
 y demoran mucho en completar sus negocios. Estos son negocios que deben tener algún cuello
 de botella en la manera que hacen sus negocios.
 
-```{r}
-#Test 
-
-nit <- read.csv("base_trabajo_segmentacion.csv", sep=";")$nit
-segConIds <- cbind(nit, datos)
-
-anti_join(clientesQueGeneranLaMayoriaTicketsSalida,segConIds[segConIds$grupo==1,], by="nit")  %>% 
-anti_join(segConIds[segConIds$grupo==3,], by="nit") #drops all observations in df1 that match in df2
-
-
-inner_join(clientesQueGeneranLaMayoriaTicketsEntrada,segConIds[segConIds$grupo==1,], by="nit")
-inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==3,], by="nit")
-
-inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==2,], by="nit")
-inner_join(clientesQueGeneranMenorTicketsEntrada,segConIds[segConIds$grupo==4,], by="nit")
-```
 
 
 # Segmentacion K-means
