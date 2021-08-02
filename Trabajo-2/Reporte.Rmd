@@ -6,9 +6,35 @@ output:
     toc: true
 ---
 
+# Introducción
+
+El presente trabajo se construye con base a la información suministrada por una base de datos simulada que contiene información de clientes corporativos de una empresa cuyos clientes son empresas.
+
+En dicho apartado se pueden encontrar dos tipos de variables, la primera de comportamiento de los clientes en canales y productos y la segunda de estados financieros de los clientes.
+
+El Clustering (Agrupamiento) es un proceso no supervisado en minería de datos y en el reconocimiento de Patrones, y se define "como una técnica para agrupar información en distintos grupos o clusters" así lo define el profesor de la Universidad Católica de Chile Karim Pichara Baksai, igualmente menciona algunos de los ejemplos más comunes en los que es aplicada esta técnica:
+
+- Segmentación de clientes.
+- Análisis en redes sociales.
+- Agrupación de documentos.
+
+El presente informe busca segmentar la base de datos mencionada anteriormente, de tal manera que le permita a "la empresa" conocer y buscar mejores alternativas que ofrecer a sus clientes a partir de técnicas de clustering como es el agrupamiento jerárquico o K-means.
+
+# Objetivo
+
+Proponer una segmentación que le permita a la empresa entender mejor a sus clientes, identificar patrones de uso de productos y canales y su relación con los estados financieros.
+
+# Problema
+
+Con la información contenida en la base de datos, se presenta el problema de determinar un agrupamiento efectivo de los clientes, que permita identificar un comportamiento en común entre los individuos de los diferentes grupos resultantes.
+
+# Materiales
+
+Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar asertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos. Para esto se usará el lenguaje de programación R y algunas librerías del lenguaje. 
 
 
-```{r}
+
+```{r,message=FALSE,warning=FALSE}
 library(tidyverse)
 library(gridExtra)
 library(cowplot)
@@ -16,6 +42,7 @@ library(fastDummies)
 library(factoextra)
 library(cluster)
 library(dplyr)
+library(knitr)
 ```
 
 
@@ -57,10 +84,15 @@ crearAnalisisDescriptivoDeTickets <- function ()
 
 ```
 
+A continuación se presenta un análisis exploratorio de los datos, que nos permite entender adecuadamente los datos, y dar pequeños indicios sobre las posibles tendencias y/o relaciones que se presentan entre las variables.
+
+Para empezar dicho análisis sobre las variables de las bases de datos, estas son divididas entre las variables de tipo númericas y de tipo categoricas. 
 
 ## Analisis variables númericas
 
-### Analisis descriptivo del valor promedio de los tickets de entrada
+A continuación, el análisis descriptivo y exploratorio de las variables de tipo númerica. 
+
+### Análisis descriptivo del valor promedio de los tickets de entrada
 
 
 ```{r}
@@ -79,23 +111,17 @@ valorPromedioTicketEntrada <-  datos[grep("en_vm.*", names(datos))] %>%
                                           "Otros canales"))
 ```
 
+A continuación, se presenta una tabla con el porcentaje  del total del valor del ticket promedio de entrada por cada canal:
 
 ```{r}
 tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(valorPromedioTicketEntrada, "Valor promedio del ticket de entrada por canal", c("ValorTotalPorCanales"))
-tablaResumenTicketPromedioDeEntrada
 ```
-
-
-
-
-
 ```{r}
 #Total por porcentaje en cada canal
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
 ```
 
-
-
+El canal número dos, es quién lidera el valor promedio total del ticket de entrada, seguido por los canales 5 y 1, quienes ocupan el segundo y tercer puesto, y cuya diferencia es muy notable con respecto a el primero; los valores siguientes son muy seguidos sin diferencias significativas y el canal 10 es quién ocupa el último lugar teniendo el menor valor promedio total de entrada por el ticket.
 
 ### Analisis de transacciones promedio por canal
 
@@ -111,20 +137,16 @@ transaccionesPromedioPorCanal <-  datos[grep("en_tx.*", names(datos))] %>%
                                           "Otros canales"))
 ```
 
+Ahora se presenta una tabla donde se muestra los porcentajes de la cantidad de transacciones mensuales en promedio por cada canal:
+
 ```{r}
 tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(transaccionesPromedioPorCanal, "Transacciones promedio de entrada por canal", c("Valor total por canal"))
-tablaResumenTicketPromedioDeEntrada
+
 ```
-
-
-
-
-
 ```{r}
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal), caption="Porcentaje de transacciones por canal", col.names="Porcentaje por canal")
 ```
-
-
+En el canal 4, se presenta el mayor valor de cantidad de transacciones mensuales en promedio, seguidos de los canales 3 y 1, y la categoría de otros canales, cuyas diferencias entre si, parecieran poco significativas; el canal 10 es el de menor valor en la lista.
 
 ### Valor del ticket promedio de salida
 
@@ -135,25 +157,24 @@ valorTicketPromedioSalida <-  datos[grep("sal_vm.*", names(datos))] %>%
                                           "Canal 8","Otros canales"))
 ```
 
+A continuación se presenta una tabla que representa el porcentaje del Valor promedio del ticket de salida por cada uno de los canales de los cuales se tiene información.
 
 ```{r}
 tablaResumenTransaccionesDeSalida <- verTablaResumenPorCategoria(valorTicketPromedioSalida, "Valor promedio del ticket de salida por canal", c("ValorTotalPorCanales"))
-tablaResumenTransaccionesDeSalida
+
 ```
-
-
-
-
-
-
 ```{r}
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
 ```
 
 
+El canal dos, es el canal que tiene un valor total promedio mayor a los demás y cuyas diferencias son aparentemente significativas con respecto a los demás canales en los cuales se tiene información.
+
 
 
 ### Transacciones promedio anuales de salida  
+
+A continuación se presenta una tabla que representa el porcentaje del Valor promedio de las transacciones mensuales promedio de salida  por cada uno de los canales de los cuales se tiene información.
 
 
 ```{r}
@@ -165,26 +186,19 @@ transaccionesPromedioDeSalida <-  datos[grep("sal_tx.*", names(datos))] %>%
 
 
 ```{r}
-verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Transacciones promedio de salida", "Dinero total de salida")
+verTablaResumenPorCategoria<-verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Transacciones promedio de salida", "Dinero total de salida")
 ```
-
-
-
 
 ```{r}
 
-knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida), caption="Porcentaje de valor mensual por canal", col.names="Porcentaje por canal")
+knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida), caption="Porcentaje de transacciones promedio anuales por canal", col.names="Porcentaje por canal")
 ```
 
 
-
-
-
+Para este caso, el canal número 2, es muy notable que ostenta el mayor porcentaje y por lo tanto el mayor número de transacciones promedio anuales de salida. 
 
 
 ### Comparación de trafico por cada canal
-
-
 
 ```{r}
 # Obtener los porcentajes por cada tipo de ticket
@@ -222,12 +236,12 @@ infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything()
 ```
 
 ```{r}
-knitr::kable(infoCanalesPorcentajes, col.names = c("Canal", "Porcentaje por ticket de entrada", "Porcentaje por transacciones mensuales de entrada",
-                                                   "Porcentaje por ticket de salida", "Porcentaje por transacciones de salida"))
+knitr::kable(infoCanalesPorcentajes, col.names = c("Canal", "Porcentaje por ticket de entrada", "Porcentaje por transacciones mensuales de entrada","Porcentaje por ticket de salida", "Porcentaje por transacciones de salida"))
 ```
 
+Se presenta un resumen de los porcentajes promedios en todas las categorias discriminada por canales, que permite clasificar los canales con mayor volumen de información y movimientos en cuanto a transacciones; de esta manera se observa que el canal dos es el medio por el cual más movimientos se producen en cuanto a el porcentaje por ticket de entrada y salida, además en el porcentaje de transacciones de salida; para el caso de el porcentaje de de transacciones mensuales de entrada quien lidera es el canal 4, con un poco más del $50\%$ de la información total.
 
-
+Los canales 6, 8, 9 y 10, son los que menos información presentan. 
 
 ```{r}
 # Grafica de porcentaje de transacciones por categoria
@@ -238,11 +252,36 @@ ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=can
   #coord_flip()
 ```
 
-
-
-
+Se presenta un grafico de barras que resume la información de las variables de tipo númerica, en donde se representa el  Porcentaje de dinero por cada categoria, discriminado por cada canal; claramente el canal dos vuelve a dominar los porcentajes promedios en las diferentes categorias y el canal cuatro maneja la parte que corresponde a porcentaje de transacciones promedio de entrada. Es importante destacar como la mayor cantidad de información se concentra entre los canales 2,3,4, y 5.
 
 ##  Variables categoricas
+
+
+A continuación, el análisis descriptivo y exploratorio de las variables de tipo categorica. 
+
+Para empezar, es importante describir cuales son los significados de estas variables las cuales representan el estado financiero de una compañía, y más exactamente algunas de ellas estan incluídas en el estado de flujo de efectivo de una empresa; este se define como un ciclo donde se incluyen actividades operativas, inversiones y financiamiento. Fuente: Science Direct. Las variables son las siguientes:
+
+* Impo_cv: [importaciones]/[compras] categorizadas. Informa acerca de la frecuencia de la entrega de importaciones.
+* Expo_vt: [exportaciones]/[ventas] categorizadas. Informa acerca de la frecuencia de la entrega de exportaciones.
+* cxp: [cuentas por pagar] categorizada con seis niveles.Compromisos de pago que la empresa ha adquirido.
+* cxc: [cuentas por cobrar] categorizada con seis niveles. Compromisos de los clientes (que tambien son empresas) han adquirido con la compañía.
+* tiene_ventas_fisicas: 1 para indicar que si tiene ventas fisicas, 0 para 
+indicar si no tiene ventas físicas.
+* tiene_ventas_electronicas: 1 para indicar que tiene ventas electronicas, 0 
+para inidicar que no tiene ventas electronicas. 
+* ciclo_negocio:[ciclo de negocio en días] categorizada con seis niveles. Son los días en que una empresa recibe el pago del producto una vez ha pagado al proveedor, pasando por la producción y distribución.
+* ciclo_financiero:[ciclo financiero en días] categorizada con seis niveles. Son los días que una empresa lograr producir un producto, una vez se compromete con el proovedor a adquirir el producto, pasando por la producción y distribución.
+*totalinventory: [valor de inventarios] categorizada con seis niveles. Representa el valor de los inventarios que son las propiedades muebles e inmuebles que posee la compañía.
+*rotacion_inventarios: [rotación de inventarios en días] categorizada con seis niveles. Son los días que la compañía demora en obtener nuevos inventarios para la distribución.
+
+A continuación se presentan cuatro (4) variables que son de tipo númericas, pero que tambien describen en gran parte la parte financiera de la empresa en el estado de flujo de efectivo. 
+
+*pagos_pj: [pagos hechos a personas jurídicas]/[pagos totales]. Porcentaje de pagos que se hacen a las personas u proveedores de naturaleza juridica en regimen tributario.
+*pagos_pn: [pagos hechos a personas naturales]/[pagos totales]. Porcentaje de pagos que se hacen a las personas u proveedores naturales en regimen tributario.
+* rotacion_cxp: [rotación de cuentas por cobrar en días] categorizada con seis niveles. Indica la cantidad de veces que las obligaciones de pago son cumplidas por la empresa.
+* rotacion_cxc:  [rotación de cuentas por pagar en días] categorizada con seis niveles. Indica la cantidad de veces que la empresa recuada el total de una obligación de pago con otra compañía.
+
+Para el siguiente análisis se muestra como se distribuye cada unas de las variables que compone esta parte del análisis, pero además es interesante hacer una comparación en cuanto a los tickets de salida, y por ello se propone comparar el top 80% que representa la mayoría de la información contra el 20% restante.
 
 ```{r, warning=F, echo=F, include=F}
 
@@ -279,8 +318,9 @@ datosConPorcentajesYTotales <-  datos %>%
 
 ```{r}
 # Genera un dataFrame donde compara el top 80% con el resto 
-resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
+resumenVariableCategoricaComparada <- function(datos, dfMayoria, dfMinoria, columna)
 {
+  sum(datos[[columna]])
     resumenDeMayoria <- dfMayoria %>%
       count(.dots=columna) %>%
       mutate(n = n/sum(n) * 100)
@@ -292,20 +332,6 @@ resumenVariableCategoricaComparada <- function(dfMayoria, dfMinoria, columna)
     resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
     return(resumenComparativo)
 }
-```
-
-
-
-```{r}
-# Se sacan los 300 mejores clientes que es la cantidad que genera el 80% de las transacciones
-clientesQueGeneranLaMayoriaTicketsEntrada <- datosConPorcentajesYTotales %>%
-                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
-                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
-                               head(n=300)
-clientesQueGeneranMenorTicketsEntrada <- datosConPorcentajesYTotales %>%
-                               filter(total_tickets_de_entrada_cliente != 0)  %>%  
-                               arrange(desc(total_tickets_de_entrada_cliente)) %>%
-                               slice(301: n())
 ```
 
 
@@ -349,10 +375,9 @@ graficar_datos <- function (df, columnaDf, nombreMasLegible)
 
 ```
 
+## Análisis clientes con mas tickets de salida
 
-## Analisis clientes con mas tickets de salida
-
-
+A continuación se genera de manera iterativa cada una de las gráficas correspondientes a las 16 variables categóricas anteriormente descritas.
 
 ```{r}
 # Con 500 clientes se genera el 80% de tickets de salida
@@ -369,7 +394,128 @@ clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
 
 
 ```{r}
+# Compara las variables categoricas (Figuras 1 a 12)
+for (columna in names(nombresLegibles))
+{
+  datosColumna <- resumenVariableCategoricaComparada(clientesQueGeneranLaMayoriaTicketsSalida, 
+                                     clientesQueGeneranMenorTicketsSalida, columna)
+  grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
+  print(grafico)
+}
+```
 
+De izquierda a derecha (Figuras 1 a 12):
+
+
+1. Importaciones de la empresa:
+
+Al analizar los resultados mostrados para la variable importaciones, Figura 1, de acuerdo con la clasificación de las empresas de 1 a 5, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de importaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de importaciones 2 con un porcentaje de alrededor el 85%; esto seguido de la categoría 1 con un 62% y en menor medida la categoría 3 con un 30% aproximadamente. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de importaciones de nivel 1 con un 38%, seguida por la categoría 2 con un 33% y en menor medida por la categoría 3 con un 15% aproximadamente. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor importaciones realizan en cada categoría.
+
+
+2. Exportaciones de la empresa: 
+
+Al analizar los resultados mostrados para la variable exportaciones, Figura 2, de acuerdo con la clasificación de las empresas de 1 a 3, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de exportaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de exportaciones 2 con un porcentaje de alrededor el XX%; esto seguido de la categoría 1 con un XX% y en menor medida la categoría 3 con un XX%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de exportaciones de nivel 2 con un XX%, seguida por la categoría 1 con un XX% y en menor medida por la categoría 3 con un XX%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor exportaciones realizan en cada categoría.
+
+
+3. Cuentas por pagar: 
+
+Al analizar los resultados mostrados para la variable cuentas por pagar, Figura 3, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe atender esta empresa con acreedores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de cuentas por pagar 2 con un porcentaje de alrededor el 67%; esto seguido de la categoría 6 con un 50% y en menor medida la categoría 1 con un 33%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de cuentas por pagar de nivel 2 con un 47%, seguida por la categoría 1 con un 38% y en menor medida por la categoría 3 con un 18%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de cuentas por pagar tiene en cada categoría.
+
+      
+4. Cuentas por cobrar: 
+
+Al analizar los resultados mostrados para la variable cuentas por cobrar, Figura 4, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe recaudar esta empresa con deudores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de cuentas por cobrar 6 con un porcentaje de alrededor el 75%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 3 con un 35%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de cuentas por cobrar de nivel 2 con un 29%, seguida por la categoría 3 con un 23% y en menor medida por la categoría 1 con un 18%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de cuentas por cobrar tiene en cada categoría.
+
+                   
+5. Inventario total:
+
+Al analizar los resultados mostrados para la variable inventario total, Figura 5, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total de inventarios que poseen, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de inventario total, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de inventario total 6 con un porcentaje de alrededor el 67%; esto seguido de la categoría 2 con un 44% y en menor medida la categoría 3 con un 21%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de inventario total de nivel 2 con un 32%, seguida por la categoría 3 con un 19% y en menor medida por la categoría 1 con un 18%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de inventario total tiene en cada categoría.
+ 
+ 
+6. Ventas Físicas: 
+
+Al analizar los resultados mostrados para la variable ventas físicas, Figura 6, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas físico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de ventas físicas, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ventas físicas 1 con un porcentaje de alrededor el XX% y en menor medida la categoría 0 con un XX%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ventas físicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que más cuentan con canales de ventas físicas.
+
+
+7. Ventas Electrónicas: 
+
+Al analizar los resultados mostrados para la variable ventas electrónicas, Figura 7, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas electrónico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 0 de ventas electrónicas, en su mayoría; es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ventas electrónicas 0 con un porcentaje de alrededor el XX% y en menor medida la categoría 1 con un XX%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ventas electrónicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que más cuentan con canales de ventas electrónicas.
+      
+      
+8. Rotación de inventarios:
+      
+Al analizar los resultados mostrados para la variable rotación de inventarios, Figura 8, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que los inventarios son convertidos en dinero, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de inventarios, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de inventarios 1 con un porcentaje de alrededor el 57%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 6 con un 36%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de inventarios de nivel 1 con un 26%, seguida por la categoría 6 con un 25% y en menor medida por la categoría 2 con un 17%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de inventarios tiene en cada categoría.
+
+      
+9. Rotación de cuentas por pagar:
+     
+Al analizar los resultados mostrados para la variable rotación de cuentas por pagar, Figura 9, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por pagar son saldadas, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de cuentas por pagar 1 con un porcentaje de alrededor el 68%; esto seguido de la categoría 2 con un 66% y en menor medida la categoría 4 con un 46%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de cuentas por pagar de nivel 1 con un 27%, seguida por la categoría 2 con un 26% y por la categoría 4 con un 26%, estas últimas con valores muy similares. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de cuentas por pagar tiene en cada categoría.
+
+
+10. Rotación de cuentas por cobrar:
+
+Al analizar los resultados mostrados para la variable rotación de cuentas por cobrar, Figura 10, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de cuentas por cobrar 1 con un porcentaje de alrededor el 77%; esto seguido de la categoría 2 con un 57% y en menor medida la categoría 4 con un 38%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de cuentas por cobrar de nivel 1 con un 35%, seguida por la categoría 2 con un 28% y por la categoría 4 con un 22%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de cuentas por cobrar tiene en cada categoría.
+
+
+11. ciclo_negocio:
+
+Al analizar los resultados mostrados para la variable ciclo de negocio, Figura 11, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado de inicio a fin en que se produce un bien y/o servicio y se entrega al cliente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 4 de ciclo de negocio, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ciclo de negocio 4 con un porcentaje de alrededor el 48%; esto seguido de la categoría 6 con un 43% y en menor medida la categoría 5 con un 41%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ciclo de negocio de nivel 6 con un 27%, seguida por la categoría 4 con un 22% y por la categoría 5 con un 21%.
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de ciclo de negocio tiene en cada categoría.
+
+
+12. ciclo_financiero:
+
+Al analizar los resultados mostrados para la variable ciclo financiero, Figura 12, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de ciclo financiero, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ciclo financiero 6 con un porcentaje de alrededor el 46%; esto seguido de la categoría 5 con un 38% y en menor medida la categoría 3 con un 34%. 
+
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ciclo financiero de nivel 6 con un 29%, seguida por la categoría 5 con un 21% y por la categoría 3 con un 18%. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de ciclo financiero tiene en cada categoría.
+
+
+```{r}
 listaDeVariablesCategoricas <- list()
 # Compara las variables categoricas
 for (columna in names(nombresLegibles))
@@ -379,28 +525,353 @@ for (columna in names(nombresLegibles))
   grafico <- graficar_datos(datosColumna, columna, nombresLegibles[[columna]])
   listaDeVariablesCategoricas <- c(listaDeVariablesCategoricas, list(grafico))
 }
+```
 
+```{r,fig.height=13,fig.width=10}
+# Resumen variables categóricas (Figuras 1 a 12) 
+do.call(grid.arrange, c(listaDeVariablesCategoricas[1:12],nrow=4))
+```
+
+### Analisis de las posibles relaciones entre los tipos de variables
+
+A continuación se presenta una comparación directa  con las variables que representan el estado financiero de la compañía y los valores que se representan númericamente con los tickets y las transacciones. 
+
+### Comparación con los porcentajes de tickets de Entrada por Cliente
+
+Mediante gráficos se propone buscar relaciones de cada variable de los estados financieros con el porcentaje de los tickets de entrada. 
+
+```{r}
+# Graficas de relacion de las exportaciones, importaciones y cuentas por pagar o cobrar con los porcentajes de tickets de entrada
+g1<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(impo_cv,porcentaje_de_tickets_de_entrada_cliente)) + 
+  labs(x = "Categorias de las importaciones sobre compras", y="Porcentaje de tickets de entrada")
+
+g2<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(expo_vt,porcentaje_de_tickets_de_entrada_cliente)) + 
+  labs(x = "Categorias de las exportaciones sobre ventas", y="Porcentaje de tickets de entrada")
+g3<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxc,porcentaje_de_tickets_de_entrada_cliente)) + 
+  labs(x = "Categorias de las cuentas por cobrar", y="Porcentaje de tickets de entrada")
+g4<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxp,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "Rotación de cuentas por cobrar en días", y="Porcentaje de tickets de entrada")
+g5<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxp,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "Categorias de las cuentas por pagar", y="Porcentaje de tickets de entrada")
+g6<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxc,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "Rotación de cuentas por pagar en días", y="Porcentaje de t6ckets de entrada")
+
+
+```
+
+```{r,fig.height=8,fig.width=8}
+grid.arrange(g1,g2,g3,g4,g5,g6, ncol=2)
+```
+
+En el anterior gráfico, se muestran los porcentajes de los tickets de entrada con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
+
+*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de tickets de entrada es inverso, pues parece que a menor frecuencia de exportacion e importación entonces es mayor el porcentaje de tickets de entrada.
+
+*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de entrada es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de entrada solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoria 6.
+
+```{r}
+# Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de tickets de entrada
+
+g7<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(totalinventory,porcentaje_de_tickets_de_entrada_cliente)) + 
+  labs(x = "Categorias del valor de los inventarios", y="Porcentaje de tickets de entrada")
+g8<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_inventarios,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "Días de rotación de Inventarios", y="Porcentaje de tickets de entrada")
+
+g9<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_negocio,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "ciclo de negocios en días", y="Porcentaje de tickets de entrada")
+g10<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_financiero,porcentaje_de_tickets_de_entrada_cliente))  + 
+  labs(x = "ciclo financiero en días", y="Porcentaje de tickets de entrada")
+```
+
+```{r,fig.height=6,fig.width=8}
+grid.arrange(g7,g8,g9,g10, ncol=2)
+```
+
+En el anterior gráfico, se muestran los porcentajes de los tickets de entrada con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
+
+*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, tal como se esperaba se muestra que la frecuencia es mayor cuando los porcentajes de tickets de entrada y el valor de los inventarios son mayores. Para el caso de la rotación de los inventarios, sucede que la frecuencia es alta cuando los días de rotación son los mas bajos y allí los porcentajes de tickets de entrada son altos. 
+
+*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de entrada altos, estan presentes cuando los días de los ciclos son poquitos; en cuanto a la frecuencia pareciese que en la compañía en estudio tiene clientes y en sus estados tiene de todo tipo de ciclos.
+
+
+```{r}
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de entrada, discriminada por si posee o no ventas fisicas
+
+g11<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_de_tickets_de_entrada_cliente),color="violetred4")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+g12<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_de_tickets_de_entrada_cliente),color="violetred4")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+g13<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_de_tickets_de_entrada_cliente),color="violetred4")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+g14<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_de_tickets_de_entrada_cliente),color="violetred4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de entrada") +facet_wrap(~tiene_ventas_fisicas)
 ```
 
 ```{r}
-# Acceder a la variable que necesitas con la variable listaDeVariablesCategoricas
-# con doble llaves cuadradadas [[]] y el indice que necesitas
-plot(listaDeVariablesCategoricas[[1]]#<- asi
-)
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de entrada, discriminada por si posee o no ventas electronicas
+
+g15<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_de_tickets_de_entrada_cliente),color="seagreen")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+g16<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_de_tickets_de_entrada_cliente),color="seagreen")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+g17<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_de_tickets_de_entrada_cliente),color="seagreen")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de tickets de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+g18<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_de_tickets_de_entrada_cliente),color="seagreen")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de entrada") +facet_wrap(~tiene_ventas_electronicas)
+```
+
+```{r,fig.height=8,fig.width=8}
+grid.arrange(g11,g15,g12,g16,g13,g17,g14,g18, ncol=2)
+```
+
+El grafico anterior es una comparación muy interesante que se propone con el objetivo de buscar diferencias inicialmente en si posee o no puntos fisicos o electronicos para la venta en el caso de los clientes.Los graficos con color violeta representan las ventas fisicas y los graficos con color verde, representan las ventas electronicas e inicialmente se puede concluir que no existen diferencias significativas frente a cambios de tendencia y/o concentración de la información; esto para este caso donde se compara el porcentaje de tickets de entrada y las variables relacionadas a pagos y recaudos.En donde si hay una diferencia es la tendencia con respecto a si posee o no punto de venta de algún tipo, es decir afecta de manera positiva para el porcentaje de tickets de entrada el tener un punto de venta ya sea fisico o electronico, el no tenerlo disminiye los tickets significativamente.
+
+Ahora, el porcentaje de tickets de entrada son bajos para todos los recaudos y pagos tanto a personas juridicas y naturales; no hay lineas de tendencias marcadas y solo para los casos de pagos tanto a personas juridicas como naturales se observa un leve aumento en el porcentaje de tickets de entrada.
+
+### Comparación con los porcentajes de tickets de Salida por Cliente
+
+Mediante gráficos se propone buscar relaciones de cada variable de los estados financieros con el porcentaje de los tickets de salida. 
+
+```{r}
+# Graficas de relacion de las exportaciones, importaciones y cuentas por pagar o cobrar con los porcentajes de tickets de salida
+p1<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(impo_cv,porcentaje_tickets_de_salida_cliente)) + 
+  labs(x = "Categorias de las importaciones sobre compras", y="Porcentaje de tickets de Salida")
+
+p2<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(expo_vt,porcentaje_tickets_de_salida_cliente)) + 
+  labs(x = "Categorias de las exportaciones sobre ventas", y="Porcentaje de tickets de Salida")
+p3<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxc,porcentaje_tickets_de_salida_cliente)) + 
+  labs(x = "Categorias de las cuentas por cobrar", y="Porcentaje de tickets de salida")
+p4<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxp,porcentaje_tickets_de_salida_cliente))  + 
+  labs(x = "Rotación de cuentas por cobrar en días", y="Porcentaje de tickets de salida")
+p5<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxp,porcentaje_tickets_de_salida_cliente))  + 
+  labs(x = "Categorias de las cuentas por pagar", y="Porcentaje de tickets de salida")
+p6<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxc,porcentaje_tickets_de_salida_cliente))  + labs(x = "Rotación de cuentas por pagar en días", y="Porcentaje de t6ckets de salida")
+
+
+```
+
+```{r,fig.height=8,fig.width=8}
+grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2)
+```
+
+En el anterior gráfico, se muestran los porcentajes de los tickets de salida con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
+
+*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de tickets de salida es inverso, pues parece que a menor frecuencia de exportacion e importación entonces es mayor el porcentaje de tickets de salida.
+
+*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de salida es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de salida solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoria 6.
+
+```{r}
+# Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de tickets de salida
+
+p7<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(totalinventory,porcentaje_tickets_de_salida_cliente)) + 
+  labs(x = "Categorias del valor de los inventarios", y="Porcentaje de tickets de salida")
+p8<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_inventarios,porcentaje_tickets_de_salida_cliente))  + 
+  labs(x = "Días de rotación de Inventarios", y="Porcentaje de tickets de salida")
+
+p9<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_negocio,porcentaje_tickets_de_salida_cliente))  + 
+  labs(x = "ciclo de negocios en días", y="Porcentaje de tickets de salida")
+p10<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_financiero,porcentaje_tickets_de_salida_cliente))  + 
+  labs(x = "ciclo financiero en días", y="Porcentaje de tickets de salida")
+```
+
+```{r,fig.height=6,fig.width=8}
+grid.arrange(p7,p8,p9,p10, ncol=2)
+```
+
+En el anterior gráfico, se muestran los porcentajes de los tickets de salida con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
+
+*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de tickets de salida son bajos casi nulos cuando las categorias de los valores de el inventario son mas bajas, y aquí la frecuencia es mayor; los únicos casos de procentajes altos de tickets de salida se presentan en la categoria 6 de el valor de los inventarios. Para el caso de la rotación de los inventarios la frecuencia es mayor para los pocos días de rotación y los porcentaje mayores de ticktes de salida se presentan a los pocos días de rotación de inventarios.  
+
+*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de salida altos, no parecen tener tendencia alguna y comportan uniforme con respecto a primer y segundo cuartil de el porcentaje de tickets de salida. 
+
+
+```{r}
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de salida, discriminada por si posee o no ventas fisicas
+
+p11<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_tickets_de_salida_cliente),color="steelblue4")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de tickets de salida")+facet_wrap(~tiene_ventas_fisicas)
+
+p12<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_tickets_de_salida_cliente),color="steelblue4")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de tickets de salida")+facet_wrap(~tiene_ventas_fisicas)
+
+p13<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_tickets_de_salida_cliente),color="steelblue4")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de tickets de salida")+facet_wrap(~tiene_ventas_fisicas)
+
+p14<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_tickets_de_salida_cliente),color="steelblue4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de salida") +facet_wrap(~tiene_ventas_fisicas)
 ```
 
 ```{r}
-# Asi puedes hacer una cuadricula con variables un subconjunto de variables
-# Con la notacion de llaves cuadradas escoges donde empezar y terminar
-# [1,6] Elementos del 1 al 6 
-do.call(grid.arrange, c(listaDeVariablesCategoricas[1:6], nrow = 2))
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de salida, discriminada por si posee o no ventas electronicas
+
+p15<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_tickets_de_salida_cliente),color="darkorange3")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de tickets de salida")+facet_wrap(~tiene_ventas_electronicas)
+
+p16<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_tickets_de_salida_cliente),color="darkorange3")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de tickets de salida")+facet_wrap(~tiene_ventas_electronicas)
+
+p17<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_tickets_de_salida_cliente),color="darkorange3")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de tickets de salida")+facet_wrap(~tiene_ventas_electronicas)
+
+p18<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_tickets_de_salida_cliente),color="darkorange3")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de salida") +facet_wrap(~tiene_ventas_electronicas)
 ```
 
+```{r,fig.height=8,fig.width=8}
+grid.arrange(p11,p15,p12,p16,p13,p17,p14,p18, ncol=2)
+```
 
+Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color azul representan las variables de los puntos fisicos y las de color naranja represantan las de los puntos de vnetas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de tickets de salida y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de tickets de salida, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
+
+
+### Comparación con los porcentajes de transacciones de entrada por cliente
+
+Mediante gráficos se propone buscar relaciones de cada variable de los estados financieros con los porcentajes de transacciones de entrada por cliente. 
+
+```{r}
+# Graficas de relacion de las exportaciones, importaciones y cuentas por pagar o cobrar con los porcentajes de entradas de clientes.
+f1<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(impo_cv,porcentaje_transacciones_de_entrada_cliente)) + 
+  labs(x = "Categorias de las importaciones sobre compras", y="% de transacciones de entrada")
+
+f2<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(expo_vt,porcentaje_transacciones_de_entrada_cliente)) +  labs(x = "Categorias de las exportaciones sobre ventas", y="% de transacciones de entrada")
+f3<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxc,porcentaje_transacciones_de_entrada_cliente)) + 
+  labs(x = "Categorias de las cuentas por cobrar", y="% de transacciones de entrada")
+f4<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxp,porcentaje_transacciones_de_entrada_cliente))  + 
+  labs(x = "Rotación de cuentas por cobrar en días", y="% de transacciones de entrada")
+f5<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(cxp,porcentaje_transacciones_de_entrada_cliente))  + 
+  labs(x = "Categorias de las cuentas por pagar", y="% de transacciones de entrada")
+f6<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_cxc,porcentaje_transacciones_de_entrada_cliente))  + labs(x = "Rotación de cuentas por pagar en días", y="% de transacciones de entrada")
+
+
+```
+
+```{r,fig.height=8,fig.width=8}
+grid.arrange(f1,f2,f3,f4,f5,f6, ncol=2)
+```
+
+En el anterior gráfico, se muestran los porcentajes de las transacciones de entrada con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
+
+*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de transacciones de entrada de los clientes casi no es evidente pues los valores de dicho porcentaje en su mayoria son bajos y la frecuencia se establece con los valores cercanos a 0 del porcentaje.
+
+*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de transacciones de entrada de los clientes es bajo, y tanto la frecuencia como los porcentajes no parecen influir en las categoriad de las cuentas por cobrar o pagar y sus respectivas rotaciones.
+
+```{r}
+# Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de transacciones de entrada de los clientes.
+
+f7<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(totalinventory,porcentaje_transacciones_de_entrada_cliente)) + 
+  labs(x = "Categorias del valor de los inventarios", y="% de transacciones de entrada")
+f8<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(rotacion_inventarios,porcentaje_transacciones_de_entrada_cliente))  + 
+  labs(x = "Días de rotación de Inventarios", y="% de transacciones de entrada")
+
+f9<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_negocio,porcentaje_transacciones_de_entrada_cliente))  + 
+  labs(x = "ciclo de negocios en días", y="% de transacciones de entrada")
+f10<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_bin2d(aes(ciclo_financiero,porcentaje_transacciones_de_entrada_cliente))  + 
+  labs(x = "ciclo financiero en días", y="% de transacciones de entrada")
+```
+
+```{r,fig.height=6,fig.width=8}
+grid.arrange(f7,f8,f9,f10, ncol=2)
+```
+En el anterior gráfico, se muestran los porcentajes de las transacciones de entrada de los clientes con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
+
+*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de transacciones de entrada en su mayoría estan por debajo del 0.10, y parece no verse afectado por el valor de los inventarios; en el caso de la rotación hay una leve afectación a menor días de rotación.
+
+
+*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de transacciones de entrada, siguen siendo muy bajas, no presenta tendencias y la frecuencia se concentra para los valores más bajos de porcentaje de trasacciones de entrada de los clientes.
+
+
+```{r}
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de transacciones de entrada, discriminada por si posee o no ventas fisicas
+
+f11<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_transacciones_de_entrada_cliente),color="darkred")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+f12<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_transacciones_de_entrada_cliente),color="darkred")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+f13<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_transacciones_de_entrada_cliente),color="darkred")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_fisicas)
+
+f14<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_transacciones_de_entrada_cliente),color="darkred")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de transacciones de entrada") +facet_wrap(~tiene_ventas_fisicas)
+```
+
+```{r}
+# Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de transacciones de entrada, discriminada por si posee o no ventas electronicas
+
+f15<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pj,porcentaje_transacciones_de_entrada_cliente),color="honeydew4")  +labs(x = "Porcentaje de pagos a P. Juridicas", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+f16<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(recaudos_pj,porcentaje_transacciones_de_entrada_cliente),color="honeydew4")  +labs(x = "Porcentaje de Recaudos de P. Juridicas", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+f17<-ggplot(data = datosConPorcentajesYTotales) + 
+  geom_point(aes(pagos_pn,porcentaje_transacciones_de_entrada_cliente),color="honeydew4")+labs(x = "Porcentaje de pagos a P. Naturales", y="% de transacciones de entrada")+facet_wrap(~tiene_ventas_electronicas)
+
+f18<-ggplot(data = datosConPorcentajesYTotales)+
+ geom_point(aes(recaudos_pn,porcentaje_transacciones_de_entrada_cliente),color="honeydew4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de transacciones de entrada") +facet_wrap(~tiene_ventas_electronicas)
+```
+
+```{r,fig.height=10,fig.width=8}
+grid.arrange(f11,f15,f12,f16,f13,f17,f14,f18, ncol=2)
+```
+
+Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color rojo oscuro representan las variables de los puntos fisicos y las de color gris represantan las de los puntos de vnetas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de transacciones de entrada y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de transacciones de entrada, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
+
+### Conclusiones del analisis exploratorio de los datos 
+
+*Del analisis de las variables númericas se concluye que el canal que contiene mejor información es el canal dos, seguido por el canal 4.
+
+*Los canales 8,9 y 10 son los menos significativos porque contienen poca información y desde ya se prevee que los gastos invertidos en dichos canales pueden llegar a representar perdidas para la compañía.
+
+*Al trabajar cada segmento como proporcion o porcentaje, se permite hacer comparaciones muy interesantes. Por ejemplo, los más altos porcentajes se presentan en las acciones de entrada, bien sea de tickets o transacciones; en cuanto a salidas los porcentajes parecen ser menores en algunos casos. 
+
+*Las mejores categorias en todas las cuentas de cobrar o pagar son la categoria número 6, teniendo en cuenta que corresponde a categorias de ordianales, supone que a mayor número mejor para la compañía y esto lo apoya la frecuencia con los clientes y los diferentes porcentajes de transacciones y de tickets que se compararon. 
+
+*La rotación de las cuentas por pagar o por cobrar, tambien se asemejan a lo que se esperaba y es que en menor tiempo posible se cobre o se pague será mejor para la compañía.
+
+*Parece no existir diferencia significativa entre los puntos de ventas fisicos o electronicos; en donde si se encuentra diferencia y esto se concluye a partir de ciertas pruebas es el hecho de tener un punto de venta sin importar como sea.
 
 #  Segmentacion jerarquica
 
-
+Para el agrupamiento jerárquico se deberá calcular las distancias entre los individuos del conjunto de datos.
+Para obtener la matriz de distancia del conjunto de datos, se utilizará la función daisy, y como el conjunto de datos contiene variables numéricas y categóricas se utilizará la métrica "gower".
 
 ```{r}
 
@@ -411,9 +882,6 @@ data<-na.omit(data)
 #Modificando las variables
 datos_reducidos=mutate(data, en_vm_otros_ = en_vm_canal6+en_vm_canal7+en_vm_canal8+en_vm_canal9+en_vm_canal10+en_vm_otros,en_tx_otros_=en_tx_canal6+en_tx_canal7+en_tx_canal8+en_tx_canal9+en_tx_canal10+en_tx_otros)
 
-
-
-
 borrar <- c("nit","en_vm_canal6","en_vm_canal7","en_vm_canal8","en_vm_canal9","en_vm_canal10","en_vm_otros","en_tx_canal6","en_tx_canal7","en_tx_canal8","en_tx_canal9","en_tx_canal10","en_tx_otros")
 datos2 <- datos_reducidos[ , !(names(datos_reducidos) %in% borrar)]#En este paso se eliminan las variables sumadas ateriormente
 
@@ -423,6 +891,57 @@ datos_categoricos=c("impo_cv","expo_vt","cxp","cxc","totalinventory","pagos_pj",
 
 datos_numericos <- datos2[ , !(names(datos2) %in% datos_categoricos)]#Para hacer los primeros análisi se dejan únicamente las variables cuantitativas del modelo
 ```
+```{r}
+set.seed(1680)
+# calculo de las distencias por medio del petodo Gower de la funcion daisy
+datos=datos[-1]
+#distancia_gower=daisy(datos,metric = "gower",type = list(ordratio=c("impo_cv","expo_vt","cxp","cxc","totalinventory","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negiocio","ciclo_financiero"),asymm=c("tiene_ventas_fisicas","tiene_ventas_electronicas")))
+
+distancia_gower=daisy(datos,metric = "gower",stand = TRUE,type = list(ordratio=c("impo_cv", "expo_vt","cxp","cxc","totalinventory","rotacion_inventarios","rotacion_cxc","rotacion_cxp","ciclo_negocio","ciclo_financiero"),asymm=c("tiene_ventas_fisicas","tiene_ventas_electronicas")))
+
+D_Tot=as.matrix(distancia_gower)
+
+```
+
+Una vez que se ha obtenido la matriz de distancias, el paso siguiente es aplicar una
+regla que permita agrupar a los sujetos o variables similares, estas reglas se les denomina
+algoritmos de clasificación. La agrupación se realiza mediante un proceso de agrupación
+sucesiva.
+
+# Algoritmo Jerárquico 
+Estos siempre tienen la misma estructura, la diferencia radica en la forma como se calculan las distancias entre grupos de individuos o variables.
+
+El algoritmo consta de los siguientes pasos:
+
+1. Comenzar con tantas clases como elementos, n. Las distancias entre clases son distancias
+entre los elementos originales.
+2. Seleccionar los dos elementos más próximos en la matriz de distancias y formar con ellos
+una clase.
+3. Sustituir los dos elementos utilizados en 2 para definir la clase con un nuevo elemento que
+represente la clase construida. Las distancias entre este nuevo elemento y los demás
+elementos se calcula con uno de los criterios para hallar distancias entre grupos.
+4. Se vuelve al paso 2 y sucesivamente al 3 hasta que se tenga todos los elementos agrupados
+en una única clase.
+
+```{r}
+cluster_jerar <- hclust(d=distancia_gower,method = "complete")
+cluster_jerar_2=hclust(d=distancia_gower,method = "ward.D")
+cluster_jerar_3=hclust(d=distancia_gower,method = "ward.D2")
+plot(cluster_jerar_3)
+```
+
+Para el presente trabajo se intentaron 3 dieferentes métodos para calcular la distancia entre grupos de individuos o variables, estos fueron el método "ward.D", "ward.D2" y complete, finalmente se seleccionó el método "ward.D2", debido a que en el dendograma obtenido representa mejor la distancia entre grupos. Este método es un procedimiento jerárquico en el cual, en cada etapa, se unen los dos clusters
+para los cuales se tenga el menor incremento en el valor total de la suma de los cuadrados de las diferencias, dentro de cada cluster, de cada individuo al centroide del cluster.
+
+```{r}
+etiqueta_grupo <- cutree(cluster_jerar_3,k=4)
+kable(table(etiqueta_grupo),col.names=c("Grupo","Elementos por grupo"))
+```
+Para análisis posteriores, se decide trabajar con 4 grupos, donde ninguno de los mismos acapara una gran cantidad de elementos en comparación con los demás.
+
+## Análisis de componentes principales
+Se realiza el análisis de componentes principales con el fin de considerar la información aportada por múltiples variables en unas pocas componentes y hacer una vusualización de las variables con las componentes seleccionadas.
+para el análisis de componentes principales, únicamente se tendrán en cuenta las variables de comportamiento de los clientes en canales y productos.
 
 ```{r}
 # Descomposicion espectral
@@ -432,18 +951,18 @@ lambdas_t<-descomp_espectr_t$values
 D_t<-descomp_espectr_t$vectors
 ```
 
+
 ```{r}
 #En caso de ser necesario, se hará un análisis del ACP
 acprincipales=prcomp(datos_numericos,scale=T)
 ```
+Para hallar las componentes principales se utiliza la función prcomp sobre el conjunto de datos; cabe aclarar que se deben estandarizar las variables antes de aplicar la función, de lo contarario si la varianza de una variable es varios ordenes superior a las demás, dominará la mayoría de las componentes principales.
 
 ```{r}
 #Qué % de variablidad es explicada para cada componente:
 prop_varianza <- acprincipales$sdev^2 / sum(acprincipales$sdev^2)
 prop_varianza*100
 ```
-
-
 ```{r}
 # Grafica de varianza acumulada 
 prop_varianza_acum <- cumsum(prop_varianza)
@@ -456,6 +975,8 @@ ggplot(data = data.frame(prop_varianza_acum, pc = 1:20),
   labs(x = "Componente principal",
        y = "Prop. varianza explicada acumulada")
 ```
+
+Una vez aplicado el método y con ayuda de la gráfica anterior, se observa que con las 10 primeras componentes, se tiene aproximadamente un 90% de la variabilidad observada en el conjunto de datos.
 
 
 ```{r, warning=F, echo=F}
@@ -472,6 +993,8 @@ PC3 = datos_proyectados[,3]
 
 plotly::plot_ly( x=~PC1, y=~PC2, z=~PC3, color=grupo$grupo )
 ```
+
+El gráfico anteriror es una representación de la utilidad del análisis de componentes principales,este representa tridimensionalmente las 3 primeras componentes y una segmentación de los grupos en el espacio definido por estas componentes.
 
 #  Analisis segmentacion jerarquica
 
