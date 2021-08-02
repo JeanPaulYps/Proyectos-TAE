@@ -318,22 +318,23 @@ datosConPorcentajesYTotales <-  datos %>%
 
 ```{r}
 # Genera un dataFrame donde compara el top 80% con el resto 
-resumenVariableCategoricaComparada <- function(datos, dfMayoria, dfMinoria, columna)
+resumenVariableCategoricaComparada <- function( dfMayoria, dfMinoria, columna)
 {
-  sum(datos[[columna]])
+    total = datos %>% count(.dots=columna) %>% select(n) %>% sum()
     resumenDeMayoria <- dfMayoria %>%
       count(.dots=columna) %>%
-      mutate(n = n/sum(n) * 100)
+      mutate(n = n/total * 100)
     
     resumenDeMinoria <- dfMinoria %>%
       count(.dots=columna) %>%
-      mutate(n = n/sum(n) * 100)
+      mutate(n = n/total * 100)
+    
+   
     
     resumenComparativo <- resumenDeMayoria %>% inner_join(resumenDeMinoria, by= structure(names=columna, .Data=columna))
     return(resumenComparativo)
 }
 ```
-
 
 
 
@@ -382,14 +383,18 @@ A continuación se genera de manera iterativa cada una de las gráficas correspo
 ```{r}
 # Con 500 clientes se genera el 80% de tickets de salida
 clientesQueGeneranLaMayoriaTicketsSalida <- datosConPorcentajesYTotales %>%
-                               filter(total_tickets_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_salida_cliente)) %>%
                                head(n=500)
 
 clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
-                               filter(total_tickets_de_salida_cliente != 0)  %>%  
                                arrange(desc(total_tickets_de_salida_cliente)) %>%
                                slice(501: n())
+```
+
+
+```{r}
+clientesQueGeneranLaMayoriaTicketsSalida
+clientesQueGeneranMenorTicketsSalida
 ```
 
 
@@ -1355,7 +1360,6 @@ for (columna in columnasParaGraficar)
     scale_y_continuous(labels=scales::percent)  +
     ylab("Porcentaje")  
   lista <- c(lista, list(p1))
-  #plot(p1)
 }
 ```
 
@@ -1608,10 +1612,9 @@ datosConFactores <-  datos %>%
 
 
 ```{r}
+listaParaGraficar <- list()
 # Graficas de variables categoricas por grupo
-columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "cxc", "totalinventory", "tiene_ventas_fisicas",
-                          "tiene_ventas_electronicas", "rotacion_inventarios", "rotacion_cxc",
-                          "rotacion_cxp", "ciclo_negocio", "ciclo_financiero")
+columnasParaGraficar <- c("impo_cv", "cxp", "totalinventory","ciclo_negocio")
 
 for (columna in columnasParaGraficar)
 {
@@ -1619,8 +1622,9 @@ for (columna in columnasParaGraficar)
     geom_bar(aes(y = (..count..)/sum(..count..)), position="stack") + 
     scale_y_continuous(labels=scales::percent)  +
     ylab("Porcentaje")  
-  plot(p1)
+  listaParaGraficar <- c(listaParaGraficar, list(p1) )
 }
+do.call(grid.arrange, c(listaParaGraficar, nrow = 2))
 ```
 
 
