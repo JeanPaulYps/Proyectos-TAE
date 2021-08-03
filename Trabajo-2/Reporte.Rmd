@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Segmentación de clientes"
 output:
   html_document:
     df_print: paged
@@ -14,7 +14,7 @@ En dicho apartado se pueden encontrar dos tipos de variables, la primera de comp
 
 El Clustering (Agrupamiento) es un proceso no supervisado en minería de datos y en el reconocimiento de Patrones, y se define como una técnica para agrupar información en distintos grupos o clusters; así lo define el profesor de la Universidad Católica de Chile Karim Pichara Baksai, igualmente menciona algunos de los ejemplos más comunes en los que es aplicada esta técnica:
 
-- segmentación de clientes.
+- Segmentación de clientes.
 - Análisis en redes sociales.
 - Agrupación de documentos.
 
@@ -30,7 +30,7 @@ Con la información contenida en la base de datos, se presenta el problema de de
 
 # Materiales
 
-Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar asertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos. para esto se usará el lenguaje de programación R, en su entorno de desarrollo integrado R STUDIO con el uso de las tecnologías de la información y de las comunicaciones. 
+Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar asertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos.Para esto se usará el lenguaje de programación R, en su entorno de desarrollo integrado R Studio.
 
 
 #  Análisis exploratorio de datos
@@ -1395,30 +1395,30 @@ for (columna in columnasParaGraficar)
 do.call(grid.arrange, c(lista[1:6], nrow = 3))
 ```
 
-### Impo CV
+### Importaciones sobre ventas
 
 En esta categoría vemos un predominio del grupo 1 en las importaciones especialmente en el nivel 2, donde alcanza su mayor proporción, eso significa que este tipo de cliente suele importar una gran cantidad y con una frecuencia no tan alta. Después tienen gran presencia los grupos 2 y 3 que importan en buena cantidad y a medida que la cantidad de importaciones aumenta la cuota de estos grupos se reducen. En último lugar tenemos al grupo 4 que tienen dos subgrupos uno que importa mucho pero sin tanta frecuencia y otro que trae productos con mucha frecuencia pero en poca cantidad.
 
-### Expo vt
+### Exportaciones sobre ventas
 
 En las exportaciones se ve que el grupo 1 alcanza una cuota muy amplia y se concentra una parte de las exportaciones en la zona media, lo cual siginifica
 que suele exportar productos mas frecuentemente que los otros grupos. Los demás grupos tienen una frecuencia de exportación que ocupa una proporción pareja entre los tres grupos frecuentes, lo que es común en estos grupos es que es que  su nivel de exportación se ubique en la zona media e inferior, eso indica que estos grupos no suelen exportar de manera tan intensiva como el grupo 1. 
 
 
-### cxp 
+### Cuentas por pagar
 
 El grupo 1 tiene muchas cuentas por pagar de gran volumen, vemos que este grupo se ubica en el último nivel con una proporción mucho mas grande que los demás, es decir que los pedidos que hace a sus proveedores suele ser de un valor muy alto es raro ver en este grupo que tengan cuentas de valor muy bajo. En cambio los demás grupos no tienen unas cuentas por pagar como si lo tiene el primer grupo. Ellos prefieren tener muchas cuentas por pagar por un valor muy bajo y sus cuentas por pagar se ubican debajo del nivel intermedio, con una proporción muy alta en el nivel 2. 
 
-### rotacion_cxp 
+### Rotación cuentas por pagar
 
 Los  grupos muestran un comportamiento muy parecido en este apartado, la tendencia es que a medida de que se las rotaciones de cuentas por pagar aumenta el número de empresas en esa categoría baja. Excepto en dos grupos particulares, el grupo 1 y 4 los cuales muestran una cantidad de empresas con rotaciones de cuentas por pagar altas a comparación de los otros grupos. 
 
-### cxc
+### Cuentas por cobrar
 
 El grupo 1 en este apartado muestra que tienen cuentas por cobrar con un valor muy alto, la proporción para las cuentas por cobrar se ven mas grandes que las cuentas por pagar lo cual puede mostrar que aunque tengan muchas cuentas por pagar con un valor muy alto la cantidad de cuentas por cobrar parecen tener un valor equivalente o superior al de las cuentas por pagar. Tal vez en las cuentas por cobrar podemos evidenciar porque este grupo tiene un rendimiento en los tickets de entrada mas grande que los demás. Para los demás grupos tenemos un comportamiento similar: aumenta la proporción de las cuentas por cobrar hasta la zona media y después de ahí cae en picada como se ve dramáticamente con el grupo 4, la mayoría suele tener mas cuentas por cobrar en el nivel 2 y 3 por lo que podemos decir que no tienen cuentas por cobrar tan grandes a comparación del grupo 1. 
 
 
-### Rotación_cxc
+### Rotación cuentas por cobrar
 
 En la rotación de cuentas por cobrar podemos ver un comportamiento similar al de las cuentas por pagar, el grupo 1 tiene proporciones similares para cada uno de los niveles. Los demás grupos a medida de que la cantidad de rotaciones aumenta la proporción de empresas se reduce pero en este caso el salto en cada nivel no reduce tan rápidamente la cantidad de empresas, si no que se reduce en saltos mas pequeños. Un caso especial es el del grupo 4 que mantiene un nivel parecido en todas las proporciones hasta el nivel 3 y en el último nivel aumenta, así que este grupo suele cobrar rápidamente sus cuentas y venden frecuentemente por los productos que ofrecen. 
 
@@ -1430,11 +1430,11 @@ do.call(grid.arrange, c(lista[7:12], nrow = 3))
 ```
 
 
-### totalInventory
+### Inventario total
 
 En este apartado, en el inventario total puede estar la clave para entender las características que hacen financieramente mas importante al grupo 1. En este grupo suelen estar las compañías con un valor de inventario muy alto se ve que la mayoría de estas empresas están ubicadas en el nivel mas alto del inventario total, por lo que son compañías con productos que tienen mucho valor. Para los demás grupos vemos que el valor de inventario suele estar por debajo la media y alcanza un máximo de su valor en el nivel 2 y a partir de ese punto se reduce la cantidad de compañías a medida de que el inventario aumenta. Un caso diferente es el del grupo 4 que sigue la misma tendencia de aumentar y después reducirse, en particular aumenta hasta el nivel 3 y de ahí se reduce hasta el nivel 5 pero con un repunte en el ultimo nivel, este  grupo entonces es mas variado y tiene una cantidad de empresas con un valor de inventario mas alto que los otros grupos pero en una proporción de compañías mas bajas en cada nivel.
 
-### rotacion_inventarios
+### Rotacion inventarios
 
 El grupo 1 tiene una rotación de inventarios muy parecida en todos los niveles, cabe resaltar que tiene una rotación muy alta en el último nivel, ya que los otros grupos a medida de que los niveles aumentan sus proporciones van bajando. Un grupo que no sigue esta tendencia es el grupo 4 que es un grupo cuya rotación suele ser alta, su presencia empieza a crecer fuertemente desde el nivel 4 y consigue una buena participación hasta el último nivel, así que estas compañías logran rotar rápidamente su inventario por lo que hay sospechas de que suelen vender frecuentemente muchos artículos de poco valor a diferencia del grupo 1 que no puede destacar en su rotación pero el valor de lo que tienen almacenado es muy grande. 
 
@@ -1473,6 +1473,7 @@ ggplot(DfConPagos_pn, aes(x=grupo, y=value, fill=grupo) ) +
   theme(legend.position = "none") + 
   labs(title= "Porcentaje de pagos a personas naturales por grupo", x="Grupo", y="Porcentaje de pagos a personas naturales")
 ```
+
 ### Porcentaje de pagos a personas naturales y personas jurídicas
 
 El grupo 1 prefiere hacer negocios con personas naturales ya que tienen una media un poco por encima de las personas naturales. Para los demas grupos vemos una preferencia mas marcada a hacer negocios con las personas jurídicas. 
@@ -1562,4 +1563,16 @@ uno tendrá más de 2000 de los 2233 elementos originales, esto se puede evidenc
 mostrada anteriormente.
 
 
+
+# Conclusiones
+
+* Como se mencionó en el análisis exploratorio de los datos, el canal 2 es de las mejores oportunidades que tiene la compañía para lograr llegar a más clientes; se recomienda explorar este canal para las transacciones mensuales.
+
+* El análisis de información de los clientes arroja resultados útiles a nivel estratégico en una empresa. Al diferenciar en grupos y discriminar los datos con variables (como numéricas o categóricas) se obtiene información sobre la frecuencia y el valor que proporcionan diferentes clientes a la empresa, características que sirven para entender necesidades y cómo operan diferentes clientes, a nivel financiero quienes presentan unos hábitos financieros saludables, por ejemplo saldar deudas a tiempo, cobrar cartera de manera efectiva y el tiempo de frecuencia empleado en cumplir con estas actividades, y a nivel comercial quienes representan clientes potenciales con capacidad de adquirir más o menos productos en el corto y largo plazo.
+
+* El análisis de componentes principales resulta una técnica apropiada de combinar con la segmentación, dado que permite obtener una representación bi o tridimensional de la distribución de los grupos.
+
+* La segmentación arroja como resultado unas subcategorías de los clientes que mejor rendimiento tienen en terminos de los tickets de entrada que resgistran. Dos subgrupos para el top 80% y dos subgrupos para el 20% inferior. Lo que hace que el grupo que mas destaque, el grupo 1 tiene que ver con la frecuencia que exporta e importa productos y con un valor de su inventario muy alto. Los demas grupos tienen muchas similitudes en especial el grupo 2 y 3 que son grupos que suelen estar en la media o inferior a esta en todas sus categorías, su mayor diferencia es si tienen o no ventas físicas. El grupo 4 tiene mucha similitud a un proveedor al minoreo, importa mercancia e intentan venderla lo mas rápido posible. 
+
+* Entre los grupos existe muchas similitudes y no existen diferencias tan radicales entre ellos, tal vez eso explica porque el gráfico de componentes principales no se formen nubes de puntos bien separadas y diferenciadas, sino que sea asemejen mas a sub-grupos concentrados de un área con mucha densidad de puntos.
 
