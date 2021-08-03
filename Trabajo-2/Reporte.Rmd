@@ -12,7 +12,7 @@ El presente trabajo se construye con base a la información suministrada por una
 
 En dicho apartado se pueden encontrar dos tipos de variables, la primera de comportamiento de los clientes en canales y productos y la segunda de estados financieros características de los clientes.
 
-El Clustering (Agrupamiento) es un proceso no supervisado en minería de datos y en el reconocimiento de Patrones, y se define como una técnica para agrupar información en distintos grupos o clusters; así lo define el profesor de la universidad católica de chile karim Pichara Baksai, igualmente menciona algunos de los ejemplos más comunes en los que es aplicada esta técnica:
+El Clustering (Agrupamiento) es un proceso no supervisado en minería de datos y en el reconocimiento de Patrones, y se define como una técnica para agrupar información en distintos grupos o clusters; así lo define el profesor de la Universidad Católica de Chile Karim Pichara Baksai, igualmente menciona algunos de los ejemplos más comunes en los que es aplicada esta técnica:
 
 - segmentación de clientes.
 - Análisis en redes sociales.
@@ -30,10 +30,10 @@ Con la información contenida en la base de datos, se presenta el problema de de
 
 # Materiales
 
-Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar acertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos. para esto se usará el lenguaje de programación R, en su entorno de desarrollo integrado R STUDIO con el uso de las tecnologías de la información y de las comunicaciones. 
+Para la ejecución del presente informe, se requiere del análisis de una base de datos con información de los clientes de una empresa; también se requiere la minería de datos para aplicar asertivamente una técnica de segmentación que permita reconocer comportamientos y tendencias entre los distintos grupos. para esto se usará el lenguaje de programación R, en su entorno de desarrollo integrado R STUDIO con el uso de las tecnologías de la información y de las comunicaciones. 
 
 
-#  Analisis exploratorio de datos
+#  Análisis exploratorio de datos
 
 ```{r,message=FALSE,warning=FALSE}
 library(ggplot2)
@@ -49,9 +49,13 @@ library(dplyr)
 library(knitr)
 ```
 
+
+
 ```{r, warning=F, echo=F, include=F}
 datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
 ```
+
+
 
 ```{r, echo=F}
 verTablaResumenPorCategoria <- function(df, titulo, titulosColumnas)
@@ -86,11 +90,11 @@ crearAnalisisDescriptivoDeTickets <- function ()
 ```
 A continuación se presenta un análisis exploratorio de los datos, que nos permite entender adecuadamente los datos, y dar pequeños indicios sobre las posibles tendencias y/o relaciones que se presentan entre las variables.
 
-Para empezar dicho análisis sobre las variables de las bases de datos, estas son divididas entre las variables de tipo númericas y de tipo categoricas. 
+Para empezar dicho análisis sobre las variables de las bases de datos, estas son divididas entre las variables de tipo numéricas y de tipo categóricas. 
 
-## Analisis variables númericas
+## Análisis variables numéricas
 
-A continuación, el análisis descriptivo y exploratorio de las variables de tipo númerica. 
+A continuación, el análisis descriptivo y exploratorio de las variables de tipo numérica. 
 
 ### Análisis descriptivo del valor promedio de los tickets de entrada
 
@@ -116,6 +120,8 @@ A continuación, se presenta una tabla con el porcentaje  del total del valor de
 ```{r}
 tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(valorPromedioTicketEntrada, "Valor promedio del ticket de entrada por canal", c("ValorTotalPorCanales"))
 ```
+
+
 ```{r}
 #Total por porcentaje en cada canal
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
@@ -123,7 +129,7 @@ knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorPromedioTicketEntrada), 
 
 El canal número dos, es quién lidera el valor promedio total del ticket de entrada, seguido por los canales 5 y 1, quienes ocupan el segundo y tercer puesto, y cuya diferencia es muy notable con respecto a el primero; los valores siguientes son muy seguidos sin diferencias significativas y el canal 10 es quién ocupa el último lugar teniendo el menor valor promedio total de entrada por el ticket.
 
-### Analisis de transacciones promedio por canal
+### Análisis de transacciones promedio por canal
 
 
 ```{r}
@@ -143,6 +149,8 @@ Ahora se presenta una tabla donde se muestra los porcentajes de la cantidad de t
 tablaResumenTicketPromedioDeEntrada <- verTablaResumenPorCategoria(transaccionesPromedioPorCanal, "Transacciones promedio de entrada por canal", c("Valor total por canal"))
 
 ```
+
+
 ```{r}
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioPorCanal), caption="Porcentaje de transacciones por canal", col.names="Porcentaje por canal")
 ```
@@ -163,6 +171,8 @@ A continuación se presenta una tabla que representa el porcentaje del Valor pro
 tablaResumenTransaccionesDeSalida <- verTablaResumenPorCategoria(valorTicketPromedioSalida, "Valor promedio del ticket de salida por canal", c("ValorTotalPorCanales"))
 
 ```
+
+
 ```{r}
 knitr::kable(obtenerTotalPorCategoriaEnPorcentajes(valorTicketPromedioSalida), caption="Porcentaje de ingresos por canal", col.names="Porcentaje por canal")
 ```
@@ -185,9 +195,13 @@ transaccionesPromedioDeSalida <-  datos[grep("sal_tx.*", names(datos))] %>%
 ```
 
 
+
+
 ```{r}
 verTablaResumenPorCategoria<-verTablaResumenPorCategoria(transaccionesPromedioDeSalida, "Transacciones promedio de salida", "Dinero total de salida")
 ```
+
+
 
 ```{r}
 
@@ -208,6 +222,8 @@ porcentajePorTicketDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(valorTicket
 porcentajePromedioDeSalida <- obtenerTotalPorCategoriaEnPorcentajes(transaccionesPromedioDeSalida)
 ```
 
+
+
 ```{r}
 # Ajustar los nombres de los tickets de salida
 porcentajePorTicketDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
@@ -215,6 +231,8 @@ porcentajePorTicketDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Cana
 porcentajePromedioDeSalida <-  data.frame(canal = c("Canal 5", "Canal 2", "Canal 8", "Otros canales"),
                                           porcentajePromedioDeSalida=porcentajePromedioDeSalida)
 ```
+
+
 
 ```{r}
 # Ajustar los nombres de los tickets de entrada
@@ -228,6 +246,8 @@ infoCanalesPorcentajes$porcentajePorTicketDeEntrada = porcentajePorTicketDeEntra
 infoCanalesPorcentajes$porcentajePorTransaccionesPromedioEntrada = porcentajePorTransaccionesPromedioEntrada
 ```
 
+
+
 ```{r}
 #Unir todos los porcentajes en un solo dataFrame
 infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePorTicketDeSalida, by="canal") 
@@ -235,11 +255,13 @@ infoCanalesPorcentajes <- left_join(infoCanalesPorcentajes, porcentajePromedioDe
 infoCanalesPorcentajes <- infoCanalesPorcentajes %>%  mutate(across(everything(), .fns = ~replace_na(.,0))) 
 ```
 
+
+
 ```{r}
 knitr::kable(infoCanalesPorcentajes, col.names = c("Canal", "Porcentaje por ticket de entrada", "Porcentaje por transacciones mensuales de entrada","Porcentaje por ticket de salida", "Porcentaje por transacciones de salida"))
 ```
 
-Se presenta un resumen de los porcentajes promedios en todas las categorias discriminada por canales, que permite clasificar los canales con mayor volumen de información y movimientos en cuanto a transacciones; de esta manera se observa que el canal dos es el medio por el cual más movimientos se producen en cuanto a el porcentaje por ticket de entrada y salida, además en el porcentaje de transacciones de salida; para el caso de el porcentaje de de transacciones mensuales de entrada quien lidera es el canal 4, con un poco más del $50\%$ de la información total.
+Se presenta un resumen de los porcentajes promedios en todas las categorías discriminada por canales, que permite clasificar los canales con mayor volumen de información y movimientos en cuanto a transacciones; de esta manera se observa que el canal dos es el medio por el cual más movimientos se producen en cuanto a el porcentaje por ticket de entrada y salida, además en el porcentaje de transacciones de salida; para el caso de el porcentaje de de transacciones mensuales de entrada quien lidera es el canal 4, con un poco más del $50\%$ de la información total.
 
 Los canales 6, 8, 9 y 10, son los que menos información presentan. 
 
@@ -252,12 +274,12 @@ ggplot(data=reshape2::melt(infoCanalesPorcentajes, id.vars = "canal"), aes(x=can
   #coord_flip()
 ```
 
-Se presenta un grafico de barras que resume la información de las variables de tipo númerica, en donde se representa el  Porcentaje de dinero por cada categoria, discriminado por cada canal; claramente el canal dos vuelve a dominar los porcentajes promedios en las diferentes categorias y el canal cuatro maneja la parte que corresponde a porcentaje de transacciones promedio de entrada. Es importante destacar como la mayor cantidad de información se concentra entre los canales 2,3,4, y 5.
+Se presenta un grafico de barras que resume la información de las variables de tipo numérica, en donde se representa el  Porcentaje de dinero por cada categoría, discriminado por cada canal; claramente el canal dos vuelve a dominar los porcentajes promedios en las diferentes categorías y el canal cuatro maneja la parte que corresponde a porcentaje de transacciones promedio de entrada. Es importante destacar como la mayor cantidad de información se concentra entre los canales 2,3,4, y 5.
 
-##  Variables categoricas
+##  Variables categóricas
 
 
-A continuación, se realiza el análisis descriptivo y exploratorio de las variables de tipo categórica. Estas variables, influyen en los estados financieros de una compañía en aspectos como las utilidades, cantidad de activos y/o pasivos a corto y largo plazo, y finalmente en el crecimiento del patrimonio. Es importante analizarlas ya que de acuerdo a su coportamiento se obtiene información que resulta valiosa para la toma de decisiones en la compañía.
+A continuación, se realiza el análisis descriptivo y exploratorio de las variables de tipo categórica. Estas variables, influyen en los estados financieros de una compañía en aspectos como las utilidades, cantidad de activos y/o pasivos a corto y largo plazo, y finalmente en el crecimiento del patrimonio. Es importante analizarlas ya que de acuerdo a su comportamiento se obtiene información que resulta valiosa para la toma de decisiones en la compañía.
 
 En total se cuentan con 16 variables definidas de la siguiente manera: 
 
@@ -270,24 +292,24 @@ En total se cuentan con 16 variables definidas de la siguiente manera:
 
       Variable:    expo_vt: [exportaciones]/[ventas] categorizadas. 
       Descripción: Clasifica de 1 a 3 las exportaciones de una empresa de acuerdo al nivel de ventas.
-      
+  
 * Cuentas por pagar: 
 
       Variable:    cxp: [cuentas por pagar] categorizada con seis niveles.
       Descripción: Clasifica a una empresa de 1 a 6 según el nivel de deuda adquirida con clientes en forma
                    de cuenta por pagar.
-                   
+  
 * Cuentas por cobrar: 
 
       Variable:    cxc: [cuentas por cobrar] categorizada con seis niveles. 
       Descripción: Clasifica a una empresa de 1 a 6 según el nivel de activos en deudas de clientes en forma
                    de cuenta por cobrar.
-                   
+  
 * Inventario total:
 
       Variable:    totalinventory: [valor de inventarios] categorizada con seis niveles.
       Descripción:  Clasifica a una empresa de 1 a 6 de acuerdo con el valor de inventarios que posee (activos no corrientes).
-      
+  
 * Ventas Físicas: 
 
       Variable:    tiene_ventas_fisicas: 1 para indicar que sí tiene ventas fisicas, 0 para indicar si no tiene ventas físicas.
@@ -297,12 +319,12 @@ En total se cuentan con 16 variables definidas de la siguiente manera:
 
       Variable:    tiene_ventas_electronicas: 1 para indicar que tiene ventas electronicas, 0 para inidicar que no tiene ventas electronicas.
       Descripción: Establece si la empresa cuenta o no con canales de venta electrónicos (Sí: 1, No: 0). 
-      
+  
 * Rotación de inventarios:
 
       Variable:    rotacion_inventarios: [rotación de inventarios en días] categorizada con seis niveles. 
       Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo en que esta emplea en convertir el inventario en a dinero o a cuentas por                       cobrar.
-      
+  
 * Rotación de cuentas por cobrar:
 
       Variable:    rotacion_cxc:  [rotación de cuentas por cobrar en días] categorizada con seis niveles.
@@ -316,20 +338,21 @@ En total se cuentan con 16 variables definidas de la siguiente manera:
 
       Variable:    [ciclo de negocio en días] categorizada con seis niveles. 
       Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo que emplea en producir un bien y/o servicio y en llegar al cliente.
-                   
+  
 * ciclo_financiero:
 
       Variable:    [ciclo financiero en días] categorizada con seis niveles. 
       Descripción: Clasifica a una empresa de 1 a 6 de acuerdo con el tiempo que emplea para que la inversión realizada en la producción de bienes y/o                       servicios sea retornada en forma de dinero, es decir hasta que sea pagada por el consumidor.
-      
-A continuación, se presentan cuatro (4) variables que son de tipo númericas, pero que también son descritas dentro de las variables de caracter financiero en este trabajo. que describen en gran parte la parte financiera de la empresa en el estado de flujo de efectivo. 
+  
+
+A continuación, se presentan cuatro (4) variables que son de tipo numéricas, pero que también son descritas dentro de las variables de carácter financiero en este trabajo. que describen en gran parte la parte financiera de la empresa en el estado de flujo de efectivo. 
 
 * Pagos personas jurídicas:
 
       Variable:    pagos_pj: [pagos hechos a personas jurídicas]/[pagos totales]. 
       Descripción: Porcentaje de pagos hechos a personas o empresas de en régimen tributario respecto a los
                    pagos totales hechos por la empresa.
-      
+  
 * Pagos personas naturales:
 
       Variable:    pagos_pn: [pagos hechos a personas naturales]/[pagos totales]. 
@@ -339,20 +362,22 @@ A continuación, se presentan cuatro (4) variables que son de tipo númericas, p
 
       Variable:    recaudos_pj: [recaudos provenientes de personas jurídicas]/[recaudos totales].
       Descripción: Porcentaje del recaudo total realizado a personas o empresas de en régimen tributario. 
-      
+  
 * Recaudo personas naturales:
 
       Variable:    recaudos_pn: [recaudos provenientes de personas naturales]/[recaudos totales].
       Descripción: Porcentaje del recaudo total realizado a personas fuera del régimen tributario.
 
-Para analizar los datos, entender mejor a los clientes y el comportamiento financiero de la empresa, se muestra la distribución de cada unas de las variables realizando una comparación con respecto a los tickets de salida. De acuerdo con esto, los resultados mostrados a continuación están discriminados por el top del 80% de las empresas (realizando varias compraraciones se llega a que este está conformado por un total de 500 empresas y/o personas jurídicas) que realizan la mayoría de transacciones de tickets de salida comparado con el 20% restante que conforman la minoría de contribuyentes. 
+Para analizar los datos, entender mejor a los clientes y el comportamiento financiero de la empresa, se muestra la distribución de cada unas de las variables realizando una comparación con respecto a los tickets de salida. De acuerdo con esto, los resultados mostrados a continuación están discriminados por el top del 80% de las empresas (realizando varias comparaciones se llega a que este está conformado por un total de 500 empresas y/o personas jurídicas) que realizan la mayoría de transacciones de tickets de salida comparado con el 20% restante que conforman la minoría de contribuyentes. 
 
-A continuación se plantea el código que será utilziado para mostrar los datos de manera gráfica, discriminando por colores cada una de las franjas de clientes bien sea que pertenezcan al top 80% o al 20% restante (Rojo y naranja respectivamente).
+A continuación se plantea el código que será utilizado para mostrar los datos de manera gráfica, discriminando por colores cada una de las franjas de clientes bien sea que pertenezcan al top 80% o al 20% restante (Rojo y naranja respectivamente).
 
 ```{r, warning=F, echo=F, include=F}
 
 datos = read.csv("base_trabajo_segmentacion.csv", sep=";") 
 ```
+
+
 
 ```{r}
 # Funcion para crear una nueva columna con el porcentaje de las transacciones que ese cliente genera 
@@ -372,6 +397,8 @@ calcularTotalPorFilas <- function(df, regexColumnas, nombreColumnaTotal, nombreC
 ```
 
 
+
+
 ```{r}
 # Calcular los porcentajes para cada tipo de ticket
 datosConPorcentajesYTotales <-  datos %>% 
@@ -380,6 +407,8 @@ datosConPorcentajesYTotales <-  datos %>%
   calcularTotalPorFilas("sal_vm", "total_tickets_de_salida_cliente", "porcentaje_tickets_de_salida_cliente") %>% 
   calcularTotalPorFilas("sal_tx", "total_transacciones_de_salida_cliente", "porcentaje_transacciones_de_salida_cliente") 
 ```
+
+
 
 
 ```{r}
@@ -421,6 +450,8 @@ names(nombresLegibles) <- c("impo_cv", "expo_vt",
 p3 <- qplot(names(nombresLegibles))
 ```
 
+
+
 ```{r}
 # Grafica los datos de una columna seleccionada
 graficar_datos <- function (df, columnaDf, nombreMasLegible)
@@ -456,6 +487,8 @@ clientesQueGeneranMenorTicketsSalida <- datosConPorcentajesYTotales %>%
 ```
 
 
+
+
 ```{r}
 listaDeVariablesCategoricas <- list()
 # Compara las variables categoricas
@@ -468,6 +501,8 @@ for (columna in names(nombresLegibles))
 }
 ```
 
+
+
 ```{r,fig.height=13,fig.width=10}
 # Resumen variables categóricas (Figuras 1 a 12) 
 do.call(grid.arrange, c(listaDeVariablesCategoricas[1:12],nrow=4))
@@ -478,118 +513,114 @@ De izquierda a derecha (Figuras 1 a 12):
 
 1. Importaciones de la empresa:
 
-Al analizar los resultados mostrados para la variable importaciones, Figura 1, de acuerdo con la clasificación de las empresas de 1 a 5, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de importaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de importaciones 2 con un porcentaje de alrededor el 85%; esto seguido de la categoría 1 con un 62% y en menor medida la categoría 3 con un 30% aproximadamente. 
+Al analizar los resultados mostrados para la variable importaciones, Figura 1, de acuerdo con la clasificación de las empresas de 1 a 5, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de importaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de importaciones 2 con un porcentaje de alrededor el 85%; esto seguido de la categoría 1 con un 62% y en menor medida la categoría 3 con un 30% aproximadamente. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de importaciones de nivel 1 con un 38%, seguida por la categoría 2 con un 33% y en menor medida por la categoría 3 con un 15% aproximadamente. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de importaciones de nivel 1 con un 38%, seguida por la categoría 2 con un 33% y en menor medida por la categoría 3 con un 15% aproximadamente. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor importaciones realizan en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor importaciones realizan en cada categoría.
 
 
 2. Exportaciones de la empresa: 
 
-Al analizar los resultados mostrados para la variable exportaciones, Figura 2, de acuerdo con la clasificación de las empresas de 1 a 3, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de exportaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de exportaciones 2 con un porcentaje de alrededor el XX%; esto seguido de la categoría 1 con un XX% y en menor medida la categoría 3 con un XX%. 
+Al analizar los resultados mostrados para la variable exportaciones, Figura 2, de acuerdo con la clasificación de las empresas de 1 a 3, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de exportaciones en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de exportaciones 2 con un porcentaje de alrededor el XX%; esto seguido de la categoría 1 con un XX% y en menor medida la categoría 3 con un XX%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de exportaciones de nivel 2 con un XX%, seguida por la categoría 1 con un XX% y en menor medida por la categoría 3 con un XX%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de exportaciones de nivel 2 con un XX%, seguida por la categoría 1 con un XX% y en menor medida por la categoría 3 con un XX%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor exportaciones realizan en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor exportaciones realizan en cada categoría.
 
 
 3. Cuentas por pagar: 
 
-Al analizar los resultados mostrados para la variable cuentas por pagar, Figura 3, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe atender esta empresa con acreedores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de cuentas por pagar 2 con un porcentaje de alrededor el 67%; esto seguido de la categoría 6 con un 50% y en menor medida la categoría 1 con un 33%. 
+Al analizar los resultados mostrados para la variable cuentas por pagar, Figura 3, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe atender esta empresa con acreedores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 2 de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de cuentas por pagar 2 con un porcentaje de alrededor el 67%; esto seguido de la categoría 6 con un 50% y en menor medida la categoría 1 con un 33%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de cuentas por pagar de nivel 2 con un 47%, seguida por la categoría 1 con un 38% y en menor medida por la categoría 3 con un 18%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de cuentas por pagar de nivel 2 con un 47%, seguida por la categoría 1 con un 38% y en menor medida por la categoría 3 con un 18%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de cuentas por pagar tiene en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de cuentas por pagar tiene en cada categoría.
 
-      
+
 4. Cuentas por cobrar: 
 
-Al analizar los resultados mostrados para la variable cuentas por cobrar, Figura 4, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe recaudar esta empresa con deudores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de cuentas por cobrar 6 con un porcentaje de alrededor el 75%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 3 con un 35%. 
+Al analizar los resultados mostrados para la variable cuentas por cobrar, Figura 4, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva a la deuda que debe recaudar esta empresa con deudores, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de cuentas por cobrar 6 con un porcentaje de alrededor el 75%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 3 con un 35%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de cuentas por cobrar de nivel 2 con un 29%, seguida por la categoría 3 con un 23% y en menor medida por la categoría 1 con un 18%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de cuentas por cobrar de nivel 2 con un 29%, seguida por la categoría 3 con un 23% y en menor medida por la categoría 1 con un 18%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de cuentas por cobrar tiene en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de cuentas por cobrar tiene en cada categoría.
 
-                   
+
 5. Inventario total:
 
-Al analizar los resultados mostrados para la variable inventario total, Figura 5, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total de inventarios que poseen, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de inventario total, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de inventario total 6 con un porcentaje de alrededor el 67%; esto seguido de la categoría 2 con un 44% y en menor medida la categoría 3 con un 21%. 
+Al analizar los resultados mostrados para la variable inventario total, Figura 5, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total de inventarios que poseen, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de inventario total, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de inventario total 6 con un porcentaje de alrededor el 67%; esto seguido de la categoría 2 con un 44% y en menor medida la categoría 3 con un 21%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de inventario total de nivel 2 con un 32%, seguida por la categoría 3 con un 19% y en menor medida por la categoría 1 con un 18%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de inventario total de nivel 2 con un 32%, seguida por la categoría 3 con un 19% y en menor medida por la categoría 1 con un 18%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de inventario total tiene en cada categoría.
- 
- 
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de inventario total tiene en cada categoría.
+
+
 6. Ventas Físicas: 
 
-Al analizar los resultados mostrados para la variable ventas físicas, Figura 6, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas físico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de ventas físicas, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ventas físicas 1 con un porcentaje de alrededor el XX% y en menor medida la categoría 0 con un XX%. 
+Al analizar los resultados mostrados para la variable ventas físicas, Figura 6, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas físico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de ventas físicas, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de ventas físicas 1 con un porcentaje de alrededor el XX% y en menor medida la categoría 0 con un XX%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ventas físicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de ventas físicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que más cuentan con canales de ventas físicas.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que más cuentan con canales de ventas físicas.
 
 
 7. Ventas Electrónicas: 
 
-Al analizar los resultados mostrados para la variable ventas electrónicas, Figura 7, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas electrónico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 0 de ventas electrónicas, en su mayoría; es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ventas electrónicas 0 con un porcentaje de alrededor el XX% y en menor medida la categoría 1 con un XX%. 
+Al analizar los resultados mostrados para la variable ventas electrónicas, Figura 7, de acuerdo con la clasificación de las empresas de 0 a 1 respectiva a si estas cuentan (1) o no (0) con un canal de ventas electrónico, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 0 de ventas electrónicas, en su mayoría; es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de ventas electrónicas 0 con un porcentaje de alrededor el XX% y en menor medida la categoría 1 con un XX%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ventas electrónicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de ventas electrónicas de nivel 0 con un XX%, seguida por la categoría 1 con un XX%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que más cuentan con canales de ventas electrónicas.
-      
-      
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que más cuentan con canales de ventas electrónicas.
 8. Rotación de inventarios:
-      
-Al analizar los resultados mostrados para la variable rotación de inventarios, Figura 8, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que los inventarios son convertidos en dinero, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de inventarios, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de inventarios 1 con un porcentaje de alrededor el 57%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 6 con un 36%. 
+   
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de inventarios de nivel 1 con un 26%, seguida por la categoría 6 con un 25% y en menor medida por la categoría 2 con un 17%. 
+Al analizar los resultados mostrados para la variable rotación de inventarios, Figura 8, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que los inventarios son convertidos en dinero, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de inventarios, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de rotación de inventarios 1 con un porcentaje de alrededor el 57%; esto seguido de la categoría 2 con un 39% y en menor medida la categoría 6 con un 36%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de inventarios tiene en cada categoría.
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de rotación de inventarios de nivel 1 con un 26%, seguida por la categoría 6 con un 25% y en menor medida por la categoría 2 con un 17%. 
 
-      
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de rotación de inventarios tiene en cada categoría.
+
+
 9. Rotación de cuentas por pagar:
-     
-Al analizar los resultados mostrados para la variable rotación de cuentas por pagar, Figura 9, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por pagar son saldadas, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de cuentas por pagar 1 con un porcentaje de alrededor el 68%; esto seguido de la categoría 2 con un 66% y en menor medida la categoría 4 con un 46%. 
+   
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de cuentas por pagar de nivel 1 con un 27%, seguida por la categoría 2 con un 26% y por la categoría 4 con un 26%, estas últimas con valores muy similares. 
+Al analizar los resultados mostrados para la variable rotación de cuentas por pagar, Figura 9, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por pagar son saldadas, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por pagar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de rotación de cuentas por pagar 1 con un porcentaje de alrededor el 68%; esto seguido de la categoría 2 con un 66% y en menor medida la categoría 4 con un 46%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de cuentas por pagar tiene en cada categoría.
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de rotación de cuentas por pagar de nivel 1 con un 27%, seguida por la categoría 2 con un 26% y por la categoría 4 con un 26%, estas últimas con valores muy similares. 
+
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de rotación de cuentas por pagar tiene en cada categoría.
 
 
 10. Rotación de cuentas por cobrar:
 
-Al analizar los resultados mostrados para la variable rotación de cuentas por cobrar, Figura 10, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de rotación de cuentas por cobrar 1 con un porcentaje de alrededor el 77%; esto seguido de la categoría 2 con un 57% y en menor medida la categoría 4 con un 38%. 
+Al analizar los resultados mostrados para la variable rotación de cuentas por cobrar, Figura 10, de acuerdo con la clasificación de las empresas de 1 a 4 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 1 de rotación de cuentas por cobrar, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de rotación de cuentas por cobrar 1 con un porcentaje de alrededor el 77%; esto seguido de la categoría 2 con un 57% y en menor medida la categoría 4 con un 38%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de rotación de cuentas por cobrar de nivel 1 con un 35%, seguida por la categoría 2 con un 28% y por la categoría 4 con un 22%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de rotación de cuentas por cobrar de nivel 1 con un 35%, seguida por la categoría 2 con un 28% y por la categoría 4 con un 22%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de rotación de cuentas por cobrar tiene en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de rotación de cuentas por cobrar tiene en cada categoría.
 
 
 11. ciclo_negocio:
 
-Al analizar los resultados mostrados para la variable ciclo de negocio, Figura 11, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado de inicio a fin en que se produce un bien y/o servicio y se entrega al cliente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 4 de ciclo de negocio, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ciclo de negocio 4 con un porcentaje de alrededor el 48%; esto seguido de la categoría 6 con un 43% y en menor medida la categoría 5 con un 41%. 
+Al analizar los resultados mostrados para la variable ciclo de negocio, Figura 11, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado de inicio a fin en que se produce un bien y/o servicio y se entrega al cliente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 4 de ciclo de negocio, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de ciclo de negocio 4 con un porcentaje de alrededor el 48%; esto seguido de la categoría 6 con un 43% y en menor medida la categoría 5 con un 41%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ciclo de negocio de nivel 6 con un 27%, seguida por la categoría 4 con un 22% y por la categoría 5 con un 21%.
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de ciclo de negocio de nivel 6 con un 27%, seguida por la categoría 4 con un 22% y por la categoría 5 con un 21%.
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de ciclo de negocio tiene en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de ciclo de negocio tiene en cada categoría.
 
 
 12. ciclo_financiero:
 
-Al analizar los resultados mostrados para la variable ciclo financiero, Figura 12, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de ciclo financiero, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoria de ciclo financiero 6 con un porcentaje de alrededor el 46%; esto seguido de la categoría 5 con un 38% y en menor medida la categoría 3 con un 34%. 
+Al analizar los resultados mostrados para la variable ciclo financiero, Figura 12, de acuerdo con la clasificación de las empresas de 1 a 6 respectiva al valor total del tiempo empleado en que las cuentas por cobrar son recaudas efectivamente, aquellas que pertenecen al top del 80% se encuentran clasificadas en la categoría 6 de ciclo financiero, en su mayoría, es decir que el 80% de las empresas que mayor aportan tickets de salidas se encuentran clasificadas en el nivel de categoría de ciclo financiero 6 con un porcentaje de alrededor el 46%; esto seguido de la categoría 5 con un 38% y en menor medida la categoría 3 con un 34%. 
 
-Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasficiada en la categoría de ciclo financiero de nivel 6 con un 29%, seguida por la categoría 5 con un 21% y por la categoría 3 con un 18%. 
+Para las empresas que pertenecen al 20% restante, se encuentra que la mayoría de ellas está clasificada en la categoría de ciclo financiero de nivel 6 con un 29%, seguida por la categoría 5 con un 21% y por la categoría 3 con un 18%. 
 
-El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a ticekts de salida son las que mayor nivel de ciclo financiero tiene en cada categoría.
+El porcentaje de empresas que conforman el top del 80% que más contribuye con transacciones por ticket de salida supera al del 20% de empresas restantes, en otras palabras las empresas que más aportan a tickets de salida son las que mayor nivel de ciclo financiero tiene en cada categoría.
 
+### Análisis de las posibles relaciones entre los tipos de variables
 
-
-
-
-### Analisis de las posibles relaciones entre los tipos de variables
-
-A continuación se presenta una comparación directa con las variables que influyen en los estados financieros de la compañía y los valores que se representan númericamente con los tickets y las transacciones.
+A continuación se presenta una comparación directa con las variables que influyen en los estados financieros de la compañía y los valores que se representan numéricamente con los tickets y las transacciones.
 
 ### Comparación con los porcentajes de tickets de Entrada por Cliente
 
@@ -618,15 +649,17 @@ g6<-ggplot(data = datosConPorcentajesYTotales) +
 
 ```
 
+
+
 ```{r,fig.height=8,fig.width=8}
 grid.arrange(g1,g2,g3,g4,g5,g6, ncol=2)
 ```
 
 En el anterior gráfico, se muestran los porcentajes de los tickets de entrada con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
 
-*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de tickets de entrada es inverso, pues parece que a menor frecuencia de exportacion e importación entonces es mayor el porcentaje de tickets de entrada.
+* En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relación con el porcentaje de tickets de entrada es inverso, pues parece que a menor frecuencia de exportación e importación entonces es mayor el porcentaje de tickets de entrada.
 
-*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de entrada es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de entrada solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoria 6.
+* En las categorías de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de entrada es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de entrada solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoría 6.
 
 ```{r}
 # Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de tickets de entrada
@@ -646,15 +679,17 @@ g10<-ggplot(data = datosConPorcentajesYTotales) +
   labs(x = "ciclo financiero en días", y="Porcentaje de tickets de entrada")
 ```
 
+
+
 ```{r,fig.height=6,fig.width=8}
 grid.arrange(g7,g8,g9,g10, ncol=2)
 ```
 
 En el anterior gráfico, se muestran los porcentajes de los tickets de entrada con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
 
-*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, tal como se esperaba se muestra que la frecuencia es mayor cuando los porcentajes de tickets de entrada y el valor de los inventarios son mayores. Para el caso de la rotación de los inventarios, sucede que la frecuencia es alta cuando los días de rotación son los mas bajos y allí los porcentajes de tickets de entrada son altos. 
+* En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, tal como se esperaba se muestra que la frecuencia es mayor cuando los porcentajes de tickets de entrada y el valor de los inventarios son mayores. Para el caso de la rotación de los inventarios, sucede que la frecuencia es alta cuando los días de rotación son los mas bajos y allí los porcentajes de tickets de entrada son altos. 
 
-*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de entrada altos, estan presentes cuando los días de los ciclos son poquitos; en cuanto a la frecuencia pareciese que en la compañía en estudio tiene clientes y en sus estados tiene de todo tipo de ciclos.
+* En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de entrada altos, estan presentes cuando los días de los ciclos son poquitos; en cuanto a la frecuencia pareciese que en la compañía en estudio tiene clientes y en sus estados tiene de todo tipo de ciclos.
 
 
 ```{r}
@@ -673,6 +708,8 @@ g14<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_de_tickets_de_entrada_cliente),color="violetred4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de entrada") +facet_wrap(~tiene_ventas_fisicas)
 ```
 
+
+
 ```{r}
 # Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de entrada, discriminada por si posee o no ventas electronicas
 
@@ -689,13 +726,15 @@ g18<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_de_tickets_de_entrada_cliente),color="seagreen")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de entrada") +facet_wrap(~tiene_ventas_electronicas)
 ```
 
+
+
 ```{r,fig.height=8,fig.width=8}
 grid.arrange(g11,g15,g12,g16,g13,g17,g14,g18, ncol=2)
 ```
 
-El grafico anterior es una comparación muy interesante que se propone con el objetivo de buscar diferencias inicialmente en si posee o no puntos fisicos o electronicos para la venta en el caso de los clientes.Los graficos con color violeta representan las ventas fisicas y los graficos con color verde, representan las ventas electronicas e inicialmente se puede concluir que no existen diferencias significativas frente a cambios de tendencia y/o concentración de la información; esto para este caso donde se compara el porcentaje de tickets de entrada y las variables relacionadas a pagos y recaudos.En donde si hay una diferencia es la tendencia con respecto a si posee o no punto de venta de algún tipo, es decir afecta de manera positiva para el porcentaje de tickets de entrada el tener un punto de venta ya sea fisico o electronico, el no tenerlo disminiye los tickets significativamente.
+El grafico anterior es una comparación muy interesante que se propone con el objetivo de buscar diferencias inicialmente en si posee o no puntos físicos o electrónicos para la venta en el caso de los clientes. Los gráficos con color violeta representan las ventas físicas y los gráficos con color verde, representan las ventas electrónicas e inicialmente se puede concluir que no existen diferencias significativas frente a cambios de tendencia y/o concentración de la información; esto para este caso donde se compara el porcentaje de tickets de entrada y las variables relacionadas a pagos y recaudos. En donde si hay una diferencia es la tendencia con respecto a si posee o no punto de venta de algún tipo, es decir afecta de manera positiva para el porcentaje de tickets de entrada el tener un punto de venta ya sea físico o electrónico, el no tenerlo disminuye los tickets significativamente.
 
-Ahora, el porcentaje de tickets de entrada son bajos para todos los recaudos y pagos tanto a personas juridicas y naturales; no hay lineas de tendencias marcadas y solo para los casos de pagos tanto a personas juridicas como naturales se observa un leve aumento en el porcentaje de tickets de entrada.
+Ahora, el porcentaje de tickets de entrada son bajos para todos los recaudos y pagos tanto a personas jurídicas y naturales; no hay líneas de tendencias marcadas y solo para los casos de pagos tanto a personas jurídicas como naturales se observa un leve aumento en el porcentaje de tickets de entrada.
 
 ### Comparación con los porcentajes de tickets de Salida por Cliente
 
@@ -725,15 +764,17 @@ p6<-ggplot(data = datosConPorcentajesYTotales) +
 
 ```
 
+
+
 ```{r,fig.height=8,fig.width=8}
 grid.arrange(p1,p2,p3,p4,p5,p6, ncol=2)
 ```
 
 En el anterior gráfico, se muestran los porcentajes de los tickets de salida con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
 
-*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de tickets de salida es inverso, pues parece que a menor frecuencia de exportacion e importación entonces es mayor el porcentaje de tickets de salida.
+* En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relación con el porcentaje de tickets de salida es inverso, pues parece que a menor frecuencia de exportación e importación entonces es mayor el porcentaje de tickets de salida.
 
-*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de salida es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de salida solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoria 6.
+* En las categorías de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de tickets de salida es bajo donde la frecuencia de cuentas por cobrar o pagar y la rotación en días es mayor. Los porcentajes de tickets de salida solo son altos para los casos donde las cuentas por pagar o cobrar son en la categoría 6.
 
 ```{r}
 # Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de tickets de salida
@@ -753,15 +794,17 @@ p10<-ggplot(data = datosConPorcentajesYTotales) +
   labs(x = "ciclo financiero en días", y="Porcentaje de tickets de salida")
 ```
 
+
+
 ```{r,fig.height=6,fig.width=8}
 grid.arrange(p7,p8,p9,p10, ncol=2)
 ```
 
 En el anterior gráfico, se muestran los porcentajes de los tickets de salida con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
 
-*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de tickets de salida son bajos casi nulos cuando las categorias de los valores de el inventario son mas bajas, y aquí la frecuencia es mayor; los únicos casos de procentajes altos de tickets de salida se presentan en la categoria 6 de el valor de los inventarios. Para el caso de la rotación de los inventarios la frecuencia es mayor para los pocos días de rotación y los porcentaje mayores de ticktes de salida se presentan a los pocos días de rotación de inventarios.  
+* En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de tickets de salida son bajos casi nulos cuando las categorías de los valores de el inventario son mas bajas, y aquí la frecuencia es mayor; los únicos casos de porcentajes altos de tickets de salida se presentan en la categoría 6 de el valor de los inventarios. Para el caso de la rotación de los inventarios la frecuencia es mayor para los pocos días de rotación y los porcentaje mayores de tickets de salida se presentan a los pocos días de rotación de inventarios.  
 
-*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de salida altos, no parecen tener tendencia alguna y comportan uniforme con respecto a primer y segundo cuartil de el porcentaje de tickets de salida. 
+* En las variables que muestran los ciclos de negocio y financiero, los porcentajes de tickets de salida altos, no parecen tener tendencia alguna y comportan uniforme con respecto a primer y segundo cuartil de el porcentaje de tickets de salida. 
 
 
 ```{r}
@@ -780,6 +823,8 @@ p14<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_tickets_de_salida_cliente),color="steelblue4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de salida") +facet_wrap(~tiene_ventas_fisicas)
 ```
 
+
+
 ```{r}
 # Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de tickets de salida, discriminada por si posee o no ventas electronicas
 
@@ -796,11 +841,13 @@ p18<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_tickets_de_salida_cliente),color="darkorange3")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de tickets de salida") +facet_wrap(~tiene_ventas_electronicas)
 ```
 
+
+
 ```{r,fig.height=8,fig.width=8}
 grid.arrange(p11,p15,p12,p16,p13,p17,p14,p18, ncol=2)
 ```
 
-Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color azul representan las variables de los puntos fisicos y las de color naranja represantan las de los puntos de vnetas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de tickets de salida y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de tickets de salida, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
+Nuevamente se incluye las variables que hablan de los puntos de ventas físicos o electrónicos, en las graficas las de color azul representan las variables de los puntos físicos y las de color naranja representan las de los puntos de ventas electrónicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de tickets de salida y las variables que hablan de los pagos o recaudos a personas jurídicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea física o electrónica el porcentaje de tickets de salida, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
 
 
 ### Comparación con los porcentajes de transacciones de entrada por cliente
@@ -830,15 +877,17 @@ f6<-ggplot(data = datosConPorcentajesYTotales) +
 
 ```
 
+
+
 ```{r,fig.height=8,fig.width=8}
 grid.arrange(f1,f2,f3,f4,f5,f6, ncol=2)
 ```
 
 En el anterior gráfico, se muestran los porcentajes de las transacciones de entrada con respecto a las variables de las exportaciones o importaciones sobre las ventas y las cuentas por pagar o cobrar:
 
-*En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relacion con el porcentaje de transacciones de entrada de los clientes casi no es evidente pues los valores de dicho porcentaje en su mayoria son bajos y la frecuencia se establece con los valores cercanos a 0 del porcentaje.
+* En las importaciones o exportaciones sobre compras: Se supone que estas variables muestran las frecuencias de las entregas de las importaciones o exportaciones hechas por la compañía y se observa que su relación con el porcentaje de transacciones de entrada de los clientes casi no es evidente pues los valores de dicho porcentaje en su mayoría son bajos y la frecuencia se establece con los valores cercanos a 0 del porcentaje.
 
-*En las categorias de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de transacciones de entrada de los clientes es bajo, y tanto la frecuencia como los porcentajes no parecen influir en las categoriad de las cuentas por cobrar o pagar y sus respectivas rotaciones.
+* En las categorías de cuentas por cobrar o pagar y su respectiva rotación en días, denota que el porcentaje de transacciones de entrada de los clientes es bajo, y tanto la frecuencia como los porcentajes no parecen influir en las categorías de las cuentas por cobrar o pagar y sus respectivas rotaciones.
 
 ```{r}
 # Graficas donde relaciona los inventarios, los tipos de ventas y los ciclos con los porcentajes de transacciones de entrada de los clientes.
@@ -858,15 +907,16 @@ f10<-ggplot(data = datosConPorcentajesYTotales) +
   labs(x = "ciclo financiero en días", y="% de transacciones de entrada")
 ```
 
+
+
 ```{r,fig.height=6,fig.width=8}
 grid.arrange(f7,f8,f9,f10, ncol=2)
 ```
 En el anterior gráfico, se muestran los porcentajes de las transacciones de entrada de los clientes con respecto a las variables de los inventarios,los tipos de ventas y los ciclos de la compañía:
 
-*En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de transacciones de entrada en su mayoría estan por debajo del 0.10, y parece no verse afectado por el valor de los inventarios; en el caso de la rotación hay una leve afectación a menor días de rotación.
+* En las variables de los inventarios, donde se relaciona el valor de los inventarios y su respectiva rotación, los porcentajes de transacciones de entrada en su mayoría están por debajo del 0.10, y parece no verse afectado por el valor de los inventarios; en el caso de la rotación hay una leve afectación a menor días de rotación.
 
-
-*En las variables que muestran los ciclos de negocio y financiero, los porcentajes de transacciones de entrada, siguen siendo muy bajas, no presenta tendencias y la frecuencia se concentra para los valores más bajos de porcentaje de trasacciones de entrada de los clientes.
+* En las variables que muestran los ciclos de negocio y financiero, los porcentajes de transacciones de entrada, siguen siendo muy bajas, no presenta tendencias y la frecuencia se concentra para los valores más bajos de porcentaje de transacciones de entrada de los clientes.
 
 
 ```{r}
@@ -885,6 +935,8 @@ f14<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_transacciones_de_entrada_cliente),color="darkred")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de transacciones de entrada") +facet_wrap(~tiene_ventas_fisicas)
 ```
 
+
+
 ```{r}
 # Graficas donde relaciona los pagos y recaudos a personas juridicas y naturales con los porcentajes de transacciones de entrada, discriminada por si posee o no ventas electronicas
 
@@ -901,40 +953,42 @@ f18<-ggplot(data = datosConPorcentajesYTotales)+
  geom_point(aes(recaudos_pn,porcentaje_transacciones_de_entrada_cliente),color="honeydew4")  +labs(x = "Porcentaje de Recaudos de P. Naturales", y="% de transacciones de entrada") +facet_wrap(~tiene_ventas_electronicas)
 ```
 
+
+
 ```{r,fig.height=10,fig.width=8}
 grid.arrange(f11,f15,f12,f16,f13,f17,f14,f18, ncol=2)
 ```
 
-Nuevamente se incluye las variables que hablan de los puntos de ventas fisicos o electronicos, en las graficas las de color rojo oscuro representan las variables de los puntos fisicos y las de color gris represantan las de los puntos de ventas electronicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de transacciones de entrada y las variables que hablan de los pagos o recaudos a personas juridicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea fisica o electronica el porcentaje de transacciones de entrada, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
+Nuevamente se incluye las variables que hablan de los puntos de ventas físicos o electrónicos, en las graficas las de color rojo oscuro representan las variables de los puntos físicos y las de color gris representan las de los puntos de ventas electrónicas y se observa que no hay diferencia significativa entre ellas. Esto para el caso donde se compara el porcentaje de transacciones de entrada y las variables que hablan de los pagos o recaudos a personas jurídicas o naturales. Afecta de manera significativa el hecho de tener un punto de venta ya sea física o electrónica el porcentaje de transacciones de entrada, para el caso de los pagos a las personas; en las variables de recaudos si bien se observan diferencias no soy tan notables como en los otros casos. 
 
-## Conclusiones del analisis exploratorio de los datos 
+## Conclusiones del análisis exploratorio de los datos 
 
-* Del analisis de las variables númericas se concluye que el canal que contiene mejor información es el canal dos, seguido por el canal 4.
+* Del análisis de las variables numéricas se concluye que el canal que contiene mejor información es el canal dos, seguido por el canal 4.
 
-* Los canales 8,9 y 10 son los menos significativos porque contienen poca información y desde ya se prevee que los gastos invertidos en dichos canales pueden llegar a representar perdidas para la compañía.
+* Los canales 8,9 y 10 son los menos significativos porque contienen poca información y desde ya se prevé que los gastos invertidos en dichos canales pueden llegar a representar perdidas para la compañía.
 
-* Al trabajar cada segmento como proporcion o porcentaje, se permite hacer comparaciones muy interesantes. Por ejemplo, los más altos porcentajes se presentan en las acciones de entrada, bien sea de tickets o transacciones; en cuanto a salidas los porcentajes parecen ser menores en algunos casos. 
+* Al trabajar cada segmento como proporción o porcentaje, se permite hacer comparaciones muy interesantes. Por ejemplo, los más altos porcentajes se presentan en las acciones de entrada, bien sea de tickets o transacciones; en cuanto a salidas los porcentajes parecen ser menores en algunos casos. 
 
-* Las mejores categorias en todas las cuentas de cobrar o pagar son la categoria número 6, teniendo en cuenta que corresponde a categorias de ordinales, supone que a mayor número mejor para la compañía y esto lo apoya la frecuencia con los clientes y los diferentes porcentajes de transacciones y de tickets que se compararon. 
+* Las mejores categorías en todas las cuentas de cobrar o pagar son la categoría número 6, teniendo en cuenta que corresponde a categorías de ordinales, supone que a mayor número mejor para la compañía y esto lo apoya la frecuencia con los clientes y los diferentes porcentajes de transacciones y de tickets que se compararon. 
 
 * La rotación de las cuentas por pagar o por cobrar, se asemejan a lo que se esperaba y es que en menor tiempo posible se cobre o se pague será mejor para la compañía.
 
-* Parece no existir diferencia significativa entre los puntos de ventas fisicos o electronicos, de acuerdo con cada una de las variables categóricas analizadas.
+* Parece no existir diferencia significativa entre los puntos de ventas físicos o electrónicos, de acuerdo con cada una de las variables categóricas analizadas.
 
-* De las variables categóricas el grupo de empresas que pertenen al 80% que más contribuye en las trabsacciones por tickets de salida es el que mejor resultados ofrece y que mayor valor brinda a las finanzas de la empresa.
+* De las variables categóricas el grupo de empresas que pertenecen al 80% que más contribuye en las transacciones por tickets de salida es el que mejor resultados ofrece y que mayor valor brinda a las finanzas de la empresa.
 
-* El valor total de inventarios de categoria 6 presenta el mayor número de empresas en comparación con las otras 5 categorías. En esta se concentran los clientes cuyo valor por inventarios es el mayor, es decir aquellas empresas de mayor tamaño según esta variable. 
+* El valor total de inventarios de categoría 6 presenta el mayor número de empresas en comparación con las otras 5 categorías. En esta se concentran los clientes cuyo valor por inventarios es el mayor, es decir aquellas empresas de mayor tamaño según esta variable. 
 
-* Más de la mitad de las empresas en el 80% que más aporta por tickets de salida presenta valores mayores al 50% para el nivel de rotación de cuentas por pagar en las categorias 1 y 2. Esto sugiere que dichas empresas son buenos clientes dado que responden a saldar deuda adquirida con otras empresas dentro de plazos de tiempo cortos.
+* Más de la mitad de las empresas en el 80% que más aporta por tickets de salida presenta valores mayores al 50% para el nivel de rotación de cuentas por pagar en las categorías 1 y 2. Esto sugiere que dichas empresas son buenos clientes dado que responden a saldar deuda adquirida con otras empresas dentro de plazos de tiempo cortos.
 
 * Tanto para las empresas en el 80% que más aporta como para el 20% de las empresas restantes de acuerdo a ticket de salida la implementación de canales electrónicos para ventas es poca (por no decir mínima). Esto sugiere que la empresa que atiende estos clientes debe de hacer uso intensivo de canales físicos para lograr brindar sus productos y/o servicios. Esta situación puede verse mejorada dado el progresivo avance en la digitalización de empresas (y por ende implementación de canales electrónicos) por parte de todas las industrias actualmente.
 
-* El comportamiento de las cuentas por pagar y el de el valor de inventarios es similar.Este patrón refleja el comportamiendo de cada empresa de acuerdo con el nivel de endeudamiento necesario para poder producir bienes y/o servicios. Esto puede indicar que se cuenta con clientes que tienen un balance financiero que es estable, es decir, que sus bienes corresponden a la cantidad adeudada más su patrimonio y que atienden a la deuda de acuerdo a un comportamiento normal de ventas por dichos bienes y/o servicios. 
+* El comportamiento de las cuentas por pagar y el de el valor de inventarios es similar. Este patrón refleja el comportamiento de cada empresa de acuerdo con el nivel de endeudamiento necesario para poder producir bienes y/o servicios. Esto puede indicar que se cuenta con clientes que tienen un balance financiero que es estable, es decir, que sus bienes corresponden a la cantidad adeudada más su patrimonio y que atienden a la deuda de acuerdo a un comportamiento normal de ventas por dichos bienes y/o servicios. 
 
-#  Segmentacion jerarquica
+#  Segmentación jerárquica
 
 Para el agrupamiento jerárquico se deberá calcular las distancias entre los individuos del conjunto de datos.
-Para obtener la matriz de distancia del conjunto de datos, se utilizará la función daisy, y como el conjunto de datos contiene variables numéricas y categóricas se utilizará la métrica "gower".
+Para obtener la matriz de distancia del conjunto de datos, se utilizará la función `daisy`, y como el conjunto de datos contiene variables numéricas y categóricas se utilizará la métrica Gower.
 
 ```{r}
 
@@ -954,6 +1008,8 @@ datos_categoricos=c("impo_cv","expo_vt","cxp","cxc","totalinventory","pagos_pj",
 
 datos_numericos <- datos2[ , !(names(datos2) %in% datos_categoricos)]#Para hacer los primeros análisi se dejan únicamente las variables cuantitativas del modelo
 ```
+
+
 ```{r}
 set.seed(1680)
 # calculo de las distencias por medio del petodo Gower de la funcion daisy
@@ -966,25 +1022,17 @@ D_Tot=as.matrix(distancia_gower)
 
 ```
 
-Una vez que se ha obtenido la matriz de distancias, el paso siguiente es aplicar una
-regla que permita agrupar a los sujetos o variables similares, estas reglas se les denomina
-algoritmos de clasificación. La agrupación se realiza mediante un proceso de agrupación
-sucesiva.
+Una vez que se ha obtenido la matriz de distancias, el paso siguiente es aplicar una regla que permita agrupar a los sujetos o variables similares, estas reglas se les denomina algoritmos de clasificación. La agrupación se realiza mediante un proceso de agrupación sucesiva.
 
 ## Algoritmo segmentación Jerárquica
 Estos siempre tienen la misma estructura, la diferencia radica en la forma como se calculan las distancias entre grupos de individuos o variables.
 
 El algoritmo consta de los siguientes pasos:
 
-1. Comenzar con tantas clases como elementos, n. Las distancias entre clases son distancias
-entre los elementos originales.
-2. Seleccionar los dos elementos más próximos en la matriz de distancias y formar con ellos
-una clase.
-3. Sustituir los dos elementos utilizados en 2 para definir la clase con un nuevo elemento que
-represente la clase construida. Las distancias entre este nuevo elemento y los demás
-elementos se calcula con uno de los criterios para hallar distancias entre grupos.
-4. Se vuelve al paso 2 y sucesivamente al 3 hasta que se tenga todos los elementos agrupados
-en una única clase.
+1. Comenzar con tantas clases como elementos, n. Las distancias entre clases son distancias entre los elementos originales.
+2. Seleccionar los dos elementos más próximos en la matriz de distancias y formar con ellos una clase.
+3. Sustituir los dos elementos utilizados en 2 para definir la clase con un nuevo elemento que represente la clase construida. Las distancias entre este nuevo elemento y los demás elementos se calcula con uno de los criterios para hallar distancias entre grupos.
+4. Se vuelve al paso 2 y sucesivamente al 3 hasta que se tenga todos los elementos agrupados en una única clase.
 
 ```{r}
 cluster_jerar <- hclust(d=distancia_gower,method = "complete")
@@ -993,8 +1041,7 @@ cluster_jerar_3=hclust(d=distancia_gower,method = "ward.D2")
 plot(cluster_jerar_3)
 ```
 
-Para el presente trabajo se intentaron 3 dieferentes métodos para calcular la distancia entre grupos de individuos o variables, estos fueron el método "ward.D", "ward.D2" y complete, finalmente se seleccionó el método "ward.D2", debido a que en el dendograma obtenido representa mejor la distancia entre grupos. Este método es un procedimiento jerárquico en el cual, en cada etapa, se unen los dos clusters
-para los cuales se tenga el menor incremento en el valor total de la suma de los cuadrados de las diferencias, dentro de cada cluster, de cada individuo al centroide del cluster.
+Para el presente trabajo se intentaron 3 deferentes métodos para calcular la distancia entre grupos de individuos o variables, estos fueron el método "ward.D", "ward.D2" y complete, finalmente se seleccionó el método "ward.D2", debido a que en el Dendograma obtenido representa mejor la distancia entre grupos. Este método es un procedimiento jerárquico en el cual, en cada etapa, se unen los dos clústeres para los cuales se tenga el menor incremento en el valor total de la suma de los cuadrados de las diferencias, dentro de cada clúster, de cada individuo al centroide del clúster.
 
 ```{r}
 etiqueta_grupo <- cutree(cluster_jerar_3,k=4)
@@ -1003,7 +1050,7 @@ kable(table(etiqueta_grupo),col.names=c("Grupo","Elementos por grupo"))
 Para análisis posteriores, se decide trabajar con 4 grupos, donde ninguno de los mismos acapara una gran cantidad de elementos en comparación con los demás.
 
 ## Análisis de componentes principales
-Se realiza el análisis de componentes principales con el fin de considerar la información aportada por múltiples variables en unas pocas componentes y hacer una vusualización de las variables con las componentes seleccionadas.
+Se realiza el análisis de componentes principales con el fin de considerar la información aportada por múltiples variables en unas pocas componentes y hacer una visualización de las variables con las componentes seleccionadas.
 para el análisis de componentes principales, únicamente se tendrán en cuenta las variables de comportamiento de los clientes en canales y productos.
 
 ```{r}
@@ -1019,13 +1066,15 @@ D_t<-descomp_espectr_t$vectors
 #En caso de ser necesario, se hará un análisis del ACP
 acprincipales=prcomp(datos_numericos,scale=T)
 ```
-Para hallar las componentes principales se utiliza la función prcomp sobre el conjunto de datos; cabe aclarar que se deben estandarizar las variables antes de aplicar la función, de lo contarario si la varianza de una variable es varios ordenes superior a las demás, dominará la mayoría de las componentes principales.
+Para hallar las componentes principales se utiliza la función prcomp sobre el conjunto de datos; cabe aclarar que se deben estandarizar las variables antes de aplicar la función, de lo contrario si la varianza de una variable es varios ordenes superior a las demás, dominará la mayoría de las componentes principales.
 
 ```{r}
 #Qué % de variablidad es explicada para cada componente:
 prop_varianza <- acprincipales$sdev^2 / sum(acprincipales$sdev^2)
 prop_varianza*100
 ```
+
+
 ```{r}
 # Grafica de varianza acumulada 
 prop_varianza_acum <- cumsum(prop_varianza)
@@ -1057,30 +1106,11 @@ PC3 = datos_proyectados[,3]
 plotly::plot_ly( x=~PC1, y=~PC2, z=~PC3, color=grupo$grupo )
 ```
 
-El gráfico anteriror es una representación de la utilidad del análisis de componentes principales,este representa tridimensionalmente las 3 primeras componentes y una segmentación de los grupos en el espacio definido por estas componentes.
+El gráfico anterior es una representación de la utilidad del análisis de componentes principales,este representa tridimensionalmente las 3 primeras componentes y una segmentación de los grupos en el espacio definido por estas componentes.
 
-#  Analisis de resultados segmentacion jerarquica
+#  Análisis de resultados segmentación jerárquica
 
-Para analizar apropiadamente a los clientes, tendremos que observar su comportamiento
-en dos categorias:
-
-* Las variables numericas, en esta categoria podremos encontrar:
-  * El valor promedio de entrada/salida del ticket por cada canal
-  * Cantidad de transacciones mensuales de entrada/salida por cada canal 
-  
-* Las variables categoricas, la estratificación de los estados financieros
-  * Informacion acerca de las importaciones
-  * Informacion acerca de las exportaciones
-  * Informacion de las cuentas por cobrar
-  * Informacion de las cuentas por pagar
-  * Informacion de los ciclos financieros
-  * Informacion de los ciclos de negocio
-
-Bajo esas categorias se le dara un identificar patrones compartidos por los
-diferentes grupos asignados por la segmentación jerarquica. En total el algoritmo 
-ha identificó 4 grupos, que se pueden interpretar como 2 sub-segmentos del top 80% 
-de clientes que mas dinero genera a la empresa y el 20% inferior. Los segmentos 
-identificados quedan de la siguiente manera:
+Bajo las variables que se tienen disponibles identificará patrones de uso compartidos por los diferentes grupos asignados por la segmentación jerárquica. En total el algoritmo ha identificó 4 grupos, que se pueden interpretar como 2 sub-segmentos del top 80% de clientes que mas dinero genera a la empresa y el 20% inferior. Los segmentos identificados quedan de la siguiente manera:
 
 * Top 80%:
   * Grupo 1: este grupo que mas ingresos genera
@@ -1089,11 +1119,7 @@ identificados quedan de la siguiente manera:
   * Grupo 4: este grupo de esta categoría que mas ingresos genera
   * Grupo 2: este grupo es el que menos ingresos genera
 
-Debido a que el grupo 1 es el que mas ingresos genera y tambien el grupo con el 
-que mas se hacen transacciones de salida, este grupo va a predominar en esta 
-primera frente a los otros grupos. 
-
-
+Debido a que el grupo 1 es el que mas ingresos genera y también el grupo con el que mas se hacen transacciones de salida, este grupo va a predominar en esta primera frente a los otros grupos. 
 
 ```{r, warning=F, echo=F, include=F}
 datos = read.csv("SegmentacionJerarquica.csv", sep=";")
@@ -1102,11 +1128,7 @@ datos = read.csv("SegmentacionJerarquica.csv", sep=";")
 
 ## Total por grupo en cada canal
 
-En la siguiente tabla se puede ver el total de dinero generados por los tickets 
-por cada canal y grupo. Y a continuación, tambien se encontrarán varios graficos donde
-se mostrará el porcentaje de participación de los grupos en cada uno de los canales.
-
-
+En la siguiente tabla se puede ver el total de dinero generados por los tickets por cada canal y grupo. Y a continuación, también se encontrarán varios gráficos donde se mostrará el porcentaje de participación de los grupos en cada uno de los canales.
 
 ```{r}
 # Obtener el total por grupo y canal
@@ -1114,6 +1136,8 @@ totalPorGrupos <- datos %>% group_by(grupo) %>%
                   summarise(across(everything(), sum))
 totalPorGrupos[,1:31] / 10^9
 ```
+
+
 
 
 ```{r, echo=FALSE}
@@ -1221,22 +1245,11 @@ grid.arrange(graficarPorcentajesDeClientesEnCanales(TiquetsDeEntradaEnPorcentaje
 
 #### Valor promedio del ticket anual
 
-Para esta categoría podemos ver los canales y los grupos que son mas relevantes.
-Podemos ver que el canal 1, 2, 5 y 7 son los canales mas importantes. Y que en 
-ellos se agrupa el mas de 90% del valor de todos los tickets. Sin duda es una 
-buena decisión seguir invirtiendo en estos canales. Como oportunidades de negocio
-se observa que el canal 3, 6 y otros canales generan al rededor del un 8%, que pueden
-ser una oportunidad para expandirse a futuro, el canal 6 parece ser un buen prospecto
-para los grupos con desempeño mas bajo, ya que si los sumamos logran alcanzar al 
-segundo mejor grupo. 
+Para esta categoría podemos ver los canales y los grupos que son mas relevantes. Podemos ver que el canal 1, 2, 5 y 7 son los canales mas importantes. Y que en ellos se agrupa el mas de 90% del valor de todos los tickets. Sin duda es una buena decisión seguir invirtiendo en estos canales. Como oportunidades de negocio se observa que el canal 3, 6 y otros canales generan al rededor del un 8%, que pueden ser una oportunidad para expandirse a futuro, el canal 6 parece ser un buen prospecto para los grupos con desempeño mas bajo, ya que si los sumamos logran alcanzar al segundo mejor grupo. 
 
-El canal 2 es donde todos llegan a tener una mayor participación en el cual el 
-grupo 1 genera 8 billones de pesos, seguido por el 3 que genera 1.2 billones de pesos, 
-seguido por el grupo 2 con 753 mil millones de pesos y grupo 4 con 629 mil millones 
-de pesos.
+El canal 2 es donde todos llegan a tener una mayor participación en el cual el grupo 1 genera 8 billones de pesos, seguido por el 3 que genera 1.2 billones de pesos, seguido por el grupo 2 con 753 mil millones de pesos y grupo 4 con 629 mil millones de pesos.
 
-A parte del canal anterior donde mas destaca el grupo 1 son en el 5 con un 16.6% del total,
-el 1 con el 11.9% del total y el 4 con el 3.4% del total. 
+A parte del canal anterior donde mas destaca el grupo 1 son en el 5 con un 16.6% del total, el 1 con el 11.9% del total y el 4 con el 3.4% del total. 
 
 
 
@@ -1244,36 +1257,21 @@ el 1 con el 11.9% del total y el 4 con el 3.4% del total.
 TiquetsDeEntradaEnPorcentajes
 ```
 
+
+
 ```{r}
  colSums(TiquetsDeEntradaEnPorcentajes[,-1])
 ```
 #### Transacciones promedio mensual 
 
 
-Los canales 4, 3, 1 y otros son los canales mas importantes para esta categoría.
-De nuevo como en el valor de los tickets anuales, hay una canal que predomina, 
-en este caso el canal 4 es el que mas transacciones genera agrupando mas del 
-50% de las transacciones mensuales. Y los canales 3, 1 y otros agrupan un 10-20% 
-de las transacciones cada uno. El único canal que mantiene una gran participación
-en ambas categorías es el canal 1 con mas del 10% de participación. Los demas canales
-manejan un volumen practicamente nulo. Una oportunidad que vale la pena explorar es
-como aumentar el volumen de transacciones mensuales para el canal 2. 
+Los canales 4, 3, 1 y otros son los canales mas importantes para esta categoría. De nuevo como en el valor de los tickets anuales, hay una canal que predomina, en este caso el canal 4 es el que mas transacciones genera agrupando mas del 50% de las transacciones mensuales. Y los canales 3, 1 y otros agrupan un 10-20% de las transacciones cada uno. El único canal que mantiene una gran participación en ambas categorías es el canal 1 con mas del 10% de participación. Los demás canales manejan un volumen prácticamente nulo. Una oportunidad que vale la pena explorar es como aumentar el volumen de transacciones mensuales para el canal 2. 
 
-Analizando mas a profundidad el grupo 1 vemos que su participación del total en 
-los diferentes canales son: 46%, 15% y 11% en los canales 4,3 y otros respectivamente.
-El grupo 3 tiene mayor participación en del: 6%, 3% y 1% en los canales 2, 1 y otros
-respectivamente. El grupo 2 y el grupo 4 tienen menos del 3 % de participación total y 
-sus canales preferido es son el 1,2 y 3. 
+Analizando mas a profundidad el grupo 1 vemos que su participación del total en los diferentes canales son: 46%, 15% y 11% en los canales 4,3 y otros respectivamente. El grupo 3 tiene mayor participación en del: 6%, 3% y 1% en los canales 2, 1 y otros respectivamente. El grupo 2 y el grupo 4 tienen menos del 3 % de participación total y sus canales preferido es son el 1,2 y 3. 
 
-Algo que no se espera es que el canal 2 tiene pocas transacciones mensuales y aun 
-así su valor de ticket anual es alto, por lo que parece que son transacciones 
-de gran volumen en un periodo corto, tal vez son clientes que compran en una temporada
-específica del año y por eso su valor de transacciones mensual no es tan alto. 
+Algo que no se espera es que el canal 2 tiene pocas transacciones mensuales y aun así su valor de ticket anual es alto, por lo que parece que son transacciones de gran volumen en un periodo corto, tal vez son clientes que compran en una temporada específica del año y por eso su valor de transacciones mensual no es tan alto. 
 
-Otro caso interesante es el del canal 4 el cual mueve unas transacciones muy altas pero
-no tiene un porcentaje de ventas tan alto. Es decir en este canal se recoge dinero 
-frecuentemente pero no alcanzan una cuota de mercado tan alto como se espera. Esto
-mismo ocurre con los clientes que participan con el canal 3 y otros. 
+Otro caso interesante es el del canal 4 el cual mueve unas transacciones muy altas pero no tiene un porcentaje de ventas tan alto. Es decir en este canal se recoge dinero frecuentemente pero no alcanzan una cuota de mercado tan alto como se espera. Esto mismo ocurre con los clientes que participan con el canal 3 y otros. 
 
 
 
@@ -1281,9 +1279,13 @@ mismo ocurre con los clientes que participan con el canal 3 y otros.
 transaccionesDeEntradaEnPorcentajes
 ```
 
+
+
 ```{r}
  colSums(transaccionesDeEntradaEnPorcentajes[,-1])
 ```
+
+
 
 
 ```{r}
@@ -1294,17 +1296,14 @@ transaccionesDeEntradaEnPorcentajes
 
 #### Valor promedio del ticket anual
 
-La gran mayoría de los tickets de salida van al canal 2 y 5 con un 98% de los
-tickets totales. El canal 2 tiene el 70% de los tickets y el canal 5 tiene
-el 20% de los mismos. Solo en el grupo 1 con los canales 2 y 5 suman al rededor 
-de 12 billones de pesos. Y contando la contribución del grupo 3 en estos suman
-2 billones de pesos. Para los grupos 2 y 4 tambien hay una preferencia por estos
-mismos canales así que hay que estudiar la necesidad de conservar los demas 
-canales.
+La gran mayoría de los tickets de salida van al canal 2 y 5 con un 98% de los tickets totales. El canal 2 tiene el 70% de los tickets y el canal 5 tiene
+el 20% de los mismos. Solo en el grupo 1 con los canales 2 y 5 suman al rededor de 12 billones de pesos. Y contando la contribución del grupo 3 en estos suman 2 billones de pesos. Para los grupos 2 y 4 también hay una preferencia por estos mismos canales así que hay que estudiar la necesidad de conservar los demás canales.
 
 ```{r}
 ticketsDeSalidaEnPorcentajes
 ```
+
+
 
 ```{r}
 colSums(ticketsDeSalidaEnPorcentajes[,-1])
@@ -1317,28 +1316,19 @@ rowSums(ticketsDeSalidaEnPorcentajes[,-1])
 ```
 #### Valor de transacciones promedio mensual 
 
-Las transacciones promedio de salida tienen un gran valor en el canal 2 y el 5
-aca podemos ver la participación de los grupos, la cual es una tendencia que 
-se repite en todas las variables númericas, el grupo 1 ocupa la gran mayor parte 
-seguido por el grupo 3 a este le sigue el grupo 2 y el grupo 4 es el que peor 
-desempeño muestra en este tipo de medidas.
+Las transacciones promedio de salida tienen un gran valor en el canal 2 y el 5 acá podemos ver la participación de los grupos, la cual es una tendencia que se repite en todas las variables numéricas, el grupo 1 ocupa la gran mayor parte seguido por el grupo 3 a este le sigue el grupo 2 y el grupo 4 es el que peor desempeño muestra en este tipo de medidas.
 
-En este caso vemos que solo el canal 2 se lleva el 98% de las transacciones mensuales, 
-aca vemos el comportamiento que se espera de los clientes con mayor transacción anual,
-un alto volumen de transacciones mensuales que se reflejan posteriormente en un valor
-de ticket mas grande. Aunque tambien podemos ver que existen varios casos como el del
-canal 5 que tiene una alta cuota del valor de los tickets pero con pocas transacciones 
+En este caso vemos que solo el canal 2 se lleva el 98% de las transacciones mensuales, acá vemos el comportamiento que se espera de los clientes con mayor transacción anual, un alto volumen de transacciones mensuales que se reflejan posteriormente en un valor de ticket mas grande. Aunque también podemos ver que existen varios casos como el del canal 5 que tiene una alta cuota del valor de los tickets pero con pocas transacciones 
 mensuales. 
 
-Analizando el comportamiento dentro del canal principal el grupo 1 en este caso 
-se lleva el 61% de las transacciones, el grupo 3 el 16%, el grupo 2 el 13% y el
-grupo 4 con el 7%. Valdría la pena analizar que tan necesarios son el canal 8 y 
-otros para la compañía ya que generan poco valor.     
- 
+Analizando el comportamiento dentro del canal principal el grupo 1 en este caso se lleva el 61% de las transacciones, el grupo 3 el 16%, el grupo 2 el 13% y el grupo 4 con el 7%. Valdría la pena analizar que tan necesarios son el canal 8 y otros para la compañía ya que generan poco valor.     
+
 
 ```{r}
 transaccionesDeSalidaEnPorcentajes
 ```
+
+
 
 ```{r}
 colSums(transaccionesDeSalidaEnPorcentajes[,-1])
@@ -1346,16 +1336,9 @@ colSums(transaccionesDeSalidaEnPorcentajes[,-1])
 
 
 
-## Variables categoricas
+## Variables categóricas
 
-En esta clasificación tendremos información acerca del flujo de efectivo, es decir
-se veran variables que miden la capacidad de una empresa de generar efectivo. Esto 
-incluye la información desde que una materia prima es registrada para la venta hasta
-que se vende finalmente el producto final y el pago es recibido por la empresa.Como
-distintas variables financieras que explican la información. 
-
-Se realizará un analisis individual de cada una de las categorías, para explicar
-los hallazgos mas importantes. 
+En esta clasificación tendremos información acerca del flujo de efectivo, es decir se verán variables que miden la capacidad de una empresa de generar efectivo. Esto incluye la información desde que una materia prima es registrada para la venta hasta que se vende finalmente el producto final y el pago es recibido por la empresa. Cómo distintas variables financieras que explican la información. Se realizará un análisis individual de cada una de las categorías, para explicar los hallazgos mas importantes. 
 
 ```{r}
 # Se modifica el DataFrame para cambiar el tipo de dato y graficar facilmente 
@@ -1383,6 +1366,8 @@ datosConFactores <-  datos %>%
 ```
 
 
+
+
 ```{r}
 # Graficas de variables categoricas por grupo
 columnasParaGraficar <- c("impo_cv", "expo_vt", "cxp", "rotacion_cxp",
@@ -1404,76 +1389,38 @@ for (columna in columnasParaGraficar)
 ```
 
 
+
+
 ```{r, fig.width=14, fig.height=12}
 do.call(grid.arrange, c(lista[1:6], nrow = 3))
 ```
 
 ### Impo CV
 
-En esta categoría vemos un predominio del grupo 1 en las importaciones especialemente
-en el nivel 2, donde alcanza su mayor proporción, eso significa que este tipo de 
-cliente suele importar una gran cantidad y con una frecuencia no tan alta. 
-Despues tienen gran presencia los grupos 2 y 3 que importan en buena cantidad y
-a medida que la cantidad de importaciones aumenta la cuota de estos grupos se
-reducen. En último lugar tenemos al grupo 4 que tienen dos subgrupos uno que
-importa mucho pero sin tanta frecuencia y otro que trae productos con mucha
-frecuencia pero en poca cantidad.
+En esta categoría vemos un predominio del grupo 1 en las importaciones especialmente en el nivel 2, donde alcanza su mayor proporción, eso significa que este tipo de cliente suele importar una gran cantidad y con una frecuencia no tan alta. Después tienen gran presencia los grupos 2 y 3 que importan en buena cantidad y a medida que la cantidad de importaciones aumenta la cuota de estos grupos se reducen. En último lugar tenemos al grupo 4 que tienen dos subgrupos uno que importa mucho pero sin tanta frecuencia y otro que trae productos con mucha frecuencia pero en poca cantidad.
 
 ### Expo vt
 
-En las exportaciones se ve que el grupo 1 alcanza una cuota muy amplia y se 
-concentra una parte de las exportaciones en la zona media, lo cual siginifica
-que suele exportar productos mas frecuentemente que los otros grupos. Los demas
-grupos tienen una frecuencia de exportacion que ocupa una proporción pareja
-entre los tres grupos frecuentes, lo que es común en estos grupos es que es que 
-su nivel de exportación se ubique en la zona media e inferior, eso indica que 
-estos grupos no suelen exportar de manera tan intensiva como el grupo 1. 
+En las exportaciones se ve que el grupo 1 alcanza una cuota muy amplia y se concentra una parte de las exportaciones en la zona media, lo cual siginifica
+que suele exportar productos mas frecuentemente que los otros grupos. Los demás grupos tienen una frecuencia de exportación que ocupa una proporción pareja entre los tres grupos frecuentes, lo que es común en estos grupos es que es que  su nivel de exportación se ubique en la zona media e inferior, eso indica que estos grupos no suelen exportar de manera tan intensiva como el grupo 1. 
 
 
 ### cxp 
 
-El grupo 1 tiene muchas cuentas por pagar de gran volumen, vemos que este grupo 
-se ubica en el último nivel con una proporción mucho mas grande que los demas, es 
-decir que los pedidos que hace a sus proovedores suele ser de un valor muy alto es
-raro ver en este grupo que tengan cuentas de valor muy bajo. En cambio los demas
-grupos no tienen unas cuentas por pagar como si lo tiene el primer grupo. Ellos 
-prefieren tener muchas cuentas por pagar por un valor muy bajo y sus cuentas por
-pagar se ubican debajo del nivel intermedio, con una proporción muy alta en el
-nivel 2. 
+El grupo 1 tiene muchas cuentas por pagar de gran volumen, vemos que este grupo se ubica en el último nivel con una proporción mucho mas grande que los demás, es decir que los pedidos que hace a sus proveedores suele ser de un valor muy alto es raro ver en este grupo que tengan cuentas de valor muy bajo. En cambio los demás grupos no tienen unas cuentas por pagar como si lo tiene el primer grupo. Ellos prefieren tener muchas cuentas por pagar por un valor muy bajo y sus cuentas por pagar se ubican debajo del nivel intermedio, con una proporción muy alta en el nivel 2. 
 
 ### rotacion_cxp 
 
-Los  grupos muestran un comportamiento muy parecido en este apartado, 
-la tendencia es que a medida de que se las rotaciones de cuentas por pagar aumenta
-el número de empresas en esa categoría baja. Excepto en dos grupos particulares, el
-grupo 1 y 4 los cuales muestran una cantidad de empresas con rotaciones de cuentas 
-por pagar altas a comparación de los otros grupos. 
+Los  grupos muestran un comportamiento muy parecido en este apartado, la tendencia es que a medida de que se las rotaciones de cuentas por pagar aumenta el número de empresas en esa categoría baja. Excepto en dos grupos particulares, el grupo 1 y 4 los cuales muestran una cantidad de empresas con rotaciones de cuentas por pagar altas a comparación de los otros grupos. 
 
 ### cxc
 
-El grupo 1 en este apartado muestra que tienen cuentas por cobrar con un valor 
-muy alto, la proporción para las cuentas por cobrar se ven mas grandes que las
-cuentas por pagar lo cual puede mostrar que aunque tengan muchas cuentas por pagar
-con un valor muy alto la cantidad de cuentas por cobrar parecen tener un valor 
-equivalente o superior al de las cuentas por pagar. Tal vez en las cuentas por 
-cobrar podemos evidenciar porque este grupo tiene un rendimiento en los tickets
-de entrada mas grande que los demas. Para los demas grupos tenemos un comportamiento
-similar: aumenta la proporción de las cuentas por cobrar hasta la zona media y despues
-de ahí cae en picada como se ve dramaticamente con el grupo 4, la mayoría suele tener
-mas cuentas por cobrar en el nivel 2 y 3 por lo que podemos decir que no tienen cuentas
-por cobrar tan grandes a comparación del grupo 1. 
+El grupo 1 en este apartado muestra que tienen cuentas por cobrar con un valor muy alto, la proporción para las cuentas por cobrar se ven mas grandes que las cuentas por pagar lo cual puede mostrar que aunque tengan muchas cuentas por pagar con un valor muy alto la cantidad de cuentas por cobrar parecen tener un valor equivalente o superior al de las cuentas por pagar. Tal vez en las cuentas por cobrar podemos evidenciar porque este grupo tiene un rendimiento en los tickets de entrada mas grande que los demás. Para los demás grupos tenemos un comportamiento similar: aumenta la proporción de las cuentas por cobrar hasta la zona media y después de ahí cae en picada como se ve dramáticamente con el grupo 4, la mayoría suele tener mas cuentas por cobrar en el nivel 2 y 3 por lo que podemos decir que no tienen cuentas por cobrar tan grandes a comparación del grupo 1. 
 
 
 ### Rotación_cxc
 
-En la rotación de cuentas por cobrar podemos ver un comportamiento similar al de las cuentas
-por pagar, el grupo 1 tiene proporciones similares para cada uno de los niveles. Los demas
-grupos a medida de que la cantidad de rotaciones aumenta la proporción de empresas se reduce
-pero en este caso el salto en cada nivel no reduce tan rapidamente la cantidad de empresas,
-si no que se reduce en saltos mas pequeños. Un caso especial es el del grupo 4 que mantiene
-un nivel parecido en todas las proporciones hasta el nivel 3 y en el último nivel aumenta, así
-que este grupo suele cobrar rápidamente sus cuentas y venden frecuentemente por los productos
-que ofrecen. 
+En la rotación de cuentas por cobrar podemos ver un comportamiento similar al de las cuentas por pagar, el grupo 1 tiene proporciones similares para cada uno de los niveles. Los demás grupos a medida de que la cantidad de rotaciones aumenta la proporción de empresas se reduce pero en este caso el salto en cada nivel no reduce tan rápidamente la cantidad de empresas, si no que se reduce en saltos mas pequeños. Un caso especial es el del grupo 4 que mantiene un nivel parecido en todas las proporciones hasta el nivel 3 y en el último nivel aumenta, así que este grupo suele cobrar rápidamente sus cuentas y venden frecuentemente por los productos que ofrecen. 
 
 
 
@@ -1485,63 +1432,23 @@ do.call(grid.arrange, c(lista[7:12], nrow = 3))
 
 ### totalInventory
 
-En este apartado, en el inventario total puede estar la clave para entender las
-características que hacen financieramente mas importante al grupo 1. En este grupo
-suelen estar las compañías con un valor de inventario muy alto se ve que la mayoría
-de estas empresas estan ubicadas en el nivel mas alto del inventario total, por lo 
-que son compañías con productos que tienen mucho valor. Para los demas grupos vemos
-que el valor de inventario suele estar por debajo la media y alcanza un maximo de su 
-valor en el nivel 2 y a partir de ese punto se reduce la cantidad de compañías a medida
-de que el inventario aumenta. Un caso diferente es el del grupo 4 que sigue la misma 
-tendencia de aumentar y despues reducirse, en particular aumenta hasta el nivel 3
-y de ahí se redcuce hasta el nivel 5 pero con un repunte en el ultimo nivel, este 
-grupo entonces es mas variado y tiene una cantidad de empresas con un valor de inventario 
-mas alto que los otros grupos pero en una proporicion de compañías mas bajas en cada nivel.
+En este apartado, en el inventario total puede estar la clave para entender las características que hacen financieramente mas importante al grupo 1. En este grupo suelen estar las compañías con un valor de inventario muy alto se ve que la mayoría de estas empresas están ubicadas en el nivel mas alto del inventario total, por lo que son compañías con productos que tienen mucho valor. Para los demás grupos vemos que el valor de inventario suele estar por debajo la media y alcanza un máximo de su valor en el nivel 2 y a partir de ese punto se reduce la cantidad de compañías a medida de que el inventario aumenta. Un caso diferente es el del grupo 4 que sigue la misma tendencia de aumentar y después reducirse, en particular aumenta hasta el nivel 3 y de ahí se reduce hasta el nivel 5 pero con un repunte en el ultimo nivel, este  grupo entonces es mas variado y tiene una cantidad de empresas con un valor de inventario mas alto que los otros grupos pero en una proporción de compañías mas bajas en cada nivel.
 
 ### rotacion_inventarios
 
-El grupo 1 tiene una rotación de inventarios muy parecida en todos los niveles, 
-cabe resaltar que tiene una rotación muy alta en el último nivel, ya que los
-otros grupos a medida de que los niveles aumentan sus proporciones van bajando.
-Un grupo que no sigue esta tendencia es el grupo 4 que es un grupo cuya 
-rotación suel ser alta, su precencia empieza a crecer fuertemente desde el 
-nivel 4 y consigue una buena participación hasta el último nivel, así que
-estas compañías logran rotar rapidamente su inventario por lo que hay sospechas
-de que suelen vender frecuentemente muchos artículos de poco valor a diferencia
-del grupo 1 que no puede destacar en su rotación pero el valor de lo que tienen
-almacenado es muy grande. 
+El grupo 1 tiene una rotación de inventarios muy parecida en todos los niveles, cabe resaltar que tiene una rotación muy alta en el último nivel, ya que los otros grupos a medida de que los niveles aumentan sus proporciones van bajando. Un grupo que no sigue esta tendencia es el grupo 4 que es un grupo cuya rotación suele ser alta, su presencia empieza a crecer fuertemente desde el nivel 4 y consigue una buena participación hasta el último nivel, así que estas compañías logran rotar rápidamente su inventario por lo que hay sospechas de que suelen vender frecuentemente muchos artículos de poco valor a diferencia del grupo 1 que no puede destacar en su rotación pero el valor de lo que tienen almacenado es muy grande. 
 
 ### Ventas físicas y electrónicas
 
-Todos los grupos no venden electrónicamente, un grupo muy pequeño es el que tiene
-este tipo de ventas. Por las ventas físcas, el grupo 1 no suele destaca en cantidad 
-en este apartado, la mitad tiene ventas físicas y la otra mitad no tiene.
-Aca el grupo 2 y 3 destacan. El grupo 2 son compañías que no tiene ventas físicas, 
-ellos generan ingresos a partir de otros canales. El grupo 3 si tiene ventas físicas y 
-es ahí donde debe generar ingresos, en ventas de sus propias tiendas.
+Todos los grupos no venden electrónicamente, un grupo muy pequeño es el que tiene este tipo de ventas. Por las ventas físicas, el grupo 1 no suele destaca en cantidad en este apartado, la mitad tiene ventas físicas y la otra mitad no tiene. Acá el grupo 2 y 3 destacan. El grupo 2 son compañías que no tiene ventas físicas, ellos generan ingresos a partir de otros canales. El grupo 3 si tiene ventas físicas y es ahí donde debe generar ingresos, en ventas de sus propias tiendas.
 
 ### Ciclo de negocio 
 
-El primer grupo aumenta la proporción de su participación a partir de arriba del nivel 3
-y son compañías que tienen un ciclo de negocio alto, esto significa que toma muchos días 
-desde el momento que hacen el pago a un proveedor hasta que reciben el pago, así que sus 
-productos son productos que demoran en ser entregados. Para los grupos 2 y 3 vemos que
-se comportan de manera muy similar tienen una participación similar que aumenta hasta el nivel 4 y 
-apartir de ese punto empiezan a decrecer, esto significa que estos dos grupos demoran 
-un tiempo alrededor de la media de estas compañías en cerrar un negocio, son productos que
-se entregan mas rápido en comparación al grupo 1. El grupo 4 muestra un comportamiento 
-atípico casí todas las empresas se ubican en el maximo nivel, esto significa que 
-toma mucho tiempo en completar todo el ciclo de negocio y dado que sus productos no 
-son tan valiosos pueda ser que sean compañías que tengan algun cuello de botella en
-sus procesos internos. 
+El primer grupo aumenta la proporción de su participación a partir de arriba del nivel 3 y son compañías que tienen un ciclo de negocio alto, esto significa que toma muchos días desde el momento que hacen el pago a un proveedor hasta que reciben el pago, así que sus productos son productos que demoran en ser entregados. Para los grupos 2 y 3 vemos que se comportan de manera muy similar tienen una participación similar que aumenta hasta el nivel 4 y a partir de ese punto empiezan a decrecer, esto significa que estos dos grupos demoran un tiempo alrededor de la media de estas compañías en cerrar un negocio, son productos que se entregan mas rápido en comparación al grupo 1. El grupo 4 muestra un comportamiento atípico casi todas las empresas se ubican en el máximo nivel, esto significa que toma mucho tiempo en completar todo el ciclo de negocio y dado que sus productos no son tan valiosos pueda ser que sean compañías que tengan algún cuello de botella en sus procesos internos. 
 
 ### Ciclo financiero
 
-Aca los grupos muestran un comportamiento parecido ya que el ciclo financiero es el
-ciclo de negocio agregado con el tiempo desde que se ordena la materia prima. En 
-este apartado vemos que se reduce el nivel 4 un poco y aumenta el nivel 1, en este 
-ultimo nivel aumenta la participación del grupo 1, 2 y 3, así que algunas compañías 
-mejoran su rendimiento cuando se mide con el pedido de proveedores.
+Acá los grupos muestran un comportamiento parecido ya que el ciclo financiero es el ciclo de negocio agregado con el tiempo desde que se ordena la materia prima. En este apartado vemos que se reduce el nivel 4 un poco y aumenta el nivel 1, en este ultimo nivel aumenta la participación del grupo 1, 2 y 3, así que algunas compañías mejoran su rendimiento cuando se mide con el pedido de proveedores.
 
 
 
@@ -1556,6 +1463,8 @@ ggplot(DfConPagos_pj, aes(x=grupo, y=value, fill=grupo) ) +
 ```
 
 
+
+
 ```{r}
 DfConPagos_pn <- datosConFactores %>% select(grupo, pagos_pn)
 DfConPagos_pn <- reshape2::melt(DfConPagos_pn, id.vars="grupo")
@@ -1566,37 +1475,18 @@ ggplot(DfConPagos_pn, aes(x=grupo, y=value, fill=grupo) ) +
 ```
 ### Porcentaje de pagos a personas naturales y personas jurídicas
 
-El grupo 1 prefiere hacer negocios con personas naturales ya que tienen una media
-un poco por encima de las personas naturales. Para los demas grupos vemos una 
-preferencia mas marcada a hacer negocios con las personas jurídicas. 
+El grupo 1 prefiere hacer negocios con personas naturales ya que tienen una media un poco por encima de las personas naturales. Para los demas grupos vemos una preferencia mas marcada a hacer negocios con las personas jurídicas. 
 
 
 ## Caracterización de grupos 
 
-* Grupo 1: estas son empresas que tienen un valor de inventario muy alto, suelen
-importar y exportar mucho mas que los demas, tienen cuentas por pagar y por cobrar
-muy grandes, con ciclos de negocios muy largos. El valor de los inventarios y el 
-volumen de las cuentas puede ser lo que explique porque esta empresa reciba tanto
-dinero de estas compañías y pague tanto dinero a las mismas.
+* Grupo 1: estas son empresas que tienen un valor de inventario muy alto, suelen importar y exportar mucho mas que los demás, tienen cuentas por pagar y por cobrar muy grandes, con ciclos de negocios muy largos. El valor de los inventarios y el volumen de las cuentas puede ser lo que explique porque esta empresa reciba tanto dinero de estas compañías y pague tanto dinero a las mismas.
 
-* Grupo 2: este grupo es muy similar al siguiente, son compañías que hacen 
-pocas importaciones al año, no tienen exportaciones particularmente grandes, 
-tienen muchas cuentas por pagar y cobrar de un valor por debajo de la media, 
-un inventario por debajo de la media, tienen un ciclo de negocio que esta 
-dentro de la media. Este grupo solo destaca en tener un modelo de negocio 
-donde no tiene ventas físicas. 
+* Grupo 2: este grupo es muy similar al siguiente, son compañías que hacen pocas importaciones al año, no tienen exportaciones particularmente grandes, tienen muchas cuentas por pagar y cobrar de un valor por debajo de la media, un inventario por debajo de la media, tienen un ciclo de negocio que esta dentro de la media. Este grupo solo destaca en tener un modelo de negocio donde no tiene ventas físicas. 
 
-* Grupo 3: tiene características similares que el grupo 2, la cantidad de importaciones,
-exportaciones, inventarios que estan por debajo de la media, tienen cuentas
-por pagar, cuentas por cobrar y ciclos de negocio que estan por la media. Este grupo
-a diferencia del anterior si tiene ventas físicas.
+* Grupo 3: tiene características similares que el grupo 2, la cantidad de importaciones, exportaciones, inventarios que están por debajo de la media, tienen cuentas por pagar, cuentas por cobrar y ciclos de negocio que están por la media. Este grupo a diferencia del anterior si tiene ventas físicas.
 
-* Grupo 4: estas empresas importan frecuentemente pero en una proporción baja, exportan
-a la misma frecuencia que la media. Tienen cuentas por pagar y por cobrar con valores
-por debajo de la media pero se hacen muchas cuentas al año, tienen inventarios por un
-valor bajo pero venden rapidamente este inventario, no muestra un tipo de venta favorito
-y demoran mucho en completar sus negocios. Estos son negocios que deben tener algún cuello
-de botella en la manera que hacen sus negocios.
+* Grupo 4: estas empresas importan frecuentemente pero en una proporción baja, exportan a la misma frecuencia que la media. Tienen cuentas por pagar y por cobrar con valores por debajo de la media pero se hacen muchas cuentas al año, tienen inventarios por un valor bajo pero venden rápidamente este inventario, no muestra un tipo de venta favorito y demoran mucho en completar sus negocios. Estos son negocios que deben tener algún cuello de botella en la manera que hacen sus negocios.
 
 
 
@@ -1607,17 +1497,15 @@ Inicialmente se planteó una segmentación utilizando el método de k-means, par
 El algoritmo k-means consta de los siguientes pasos:
 
 1. Se define el número de grupos K.
-2. secrean K centroides al azar.
+2. Se crean K centroides al azar.
+   - Se organizan aleatoriamente K elementos como centroides.
+   - Se generan aleatoriamente usando los rangos de cada variable.
 
-* Se organizan aleatoriamente K elementos como centroides.
-* Se generan aleatoriamente usando los rangos de cada variable.
-
-3. Se asgina cada observación al centroide más cercano.
+3. Se asigna cada observación al centroide más cercano.
 4. Se calculan los centroides.
 5. se repiten los pasos 3 y 4 hasta:
-
-* Completar un número de iteraciones fijo.
-* Que los centroides no cambien.
+   - Completar un número de iteraciones fijo.
+   - Que los centroides no cambien.
 
 ```{r}
 datos = read.csv("SegmentacionPCA.csv", sep=";")
