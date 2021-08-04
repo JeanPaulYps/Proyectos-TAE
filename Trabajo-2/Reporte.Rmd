@@ -1,5 +1,6 @@
 ---
 title: "Segmentación de clientes"
+author: "Laura Daniela Hoyos Peña, Jean Paul Yepes Guarnizo, Hans Guillermo García Vargas, Juan Camilo Pulgarin Carmona"
 output:
   html_document:
     df_print: paged
